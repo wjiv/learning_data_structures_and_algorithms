@@ -46,7 +46,7 @@ void SequenceList::initList(int length)
 //判断顺序表是否为空
 bool SequenceList::isEmpty()
 {
-    count == 0;
+    return count == 0;
 }
 
 // 插入元素
@@ -82,6 +82,8 @@ ElementType SequenceList::find(int index)
 {
     if (index >= 1 && index <= count)
         return data[index - 1];
+    else 
+        return -1;
 }
 
 // // 根据元素返回所在位置
