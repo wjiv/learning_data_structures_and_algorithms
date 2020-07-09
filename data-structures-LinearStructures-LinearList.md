@@ -221,7 +221,19 @@ int main(){
 - **C++编码实现**：
 
 ```C++
-
+//原地逆置线性表
+void ReverseList(SequenceList &sequenceList)
+{
+    if (sequenceList.count == 0)
+        return;
+    ElementType tmp;
+    for (int i = 0; i < sequenceList.count / 2; i++)
+    {
+        tmp = sequenceList.data[i];
+        sequenceList.data[i] = sequenceList.data[sequenceList.count - 1 - i];
+        sequenceList.data[sequenceList.count - 1 - i] = tmp;
+    }
+}
 ```
 
 2. 设计一个算法，从顺序表中删除具有最小值的元素，并由函数返回被删元素的值。空出的位置由表中最后一个元素填补，若顺序表为空则显示错误信息并结束运行。
@@ -229,15 +241,42 @@ int main(){
 - **C++编码实现**：
 
 ```C++
-
+//从线性表中删除具有最小值的元素，返回被删元素的值及删除结果
+int DeleteElementWithMinValue(SequenceList &sequenceList, ElementType &deleteData)
+{
+    if (sequenceList.count == 0)
+        return 0; //0表示删除失败
+    int minValuePosition = 0;
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] <= sequenceList.data[minValuePosition])
+            minValuePosition = i;
+    }
+    deleteData = sequenceList.data[minValuePosition];
+    sequenceList.data[minValuePosition] = sequenceList.data[sequenceList.count - 1];
+    return 1; //1表示删除成功
+}
 ```
 
-3. 设计一个算法，从顺序表中删除第i个元素并由函数返回被删元素的值，如果i不合理或者表为空，则显示错误信息并退出运行。
+3. 设计一个算法，从顺序表中删除第position个元素并由函数返回被删元素的值，如果position不合理或者表为空，则显示错误信息并退出运行。
 
 - **C++编码实现**：
 
 ```C++
-
+//从顺序表第position个位置删除元素，返回删除元素的值以及位置不合理等错误信息
+int DeleteEmementByPosition(SequenceList &sequenceList, int position, ElementType &deleteData)
+{
+    if (sequenceList.count == 0)
+        return 0; //0表示表为空
+    if (position < 1 || position > sequenceList.count)
+        return -1; //-1表示删除位置不合理
+    deleteData = sequenceList.data[position - 1];
+    for (int i = position - 1; i < sequenceList.count; i++)
+    {
+        sequenceList.data[i] = sequenceList.data[i + 1];
+    }
+    return 1; //1表示删除成功
+}
 ```
 
 4. 设计一个算法，向顺序表中第i个位置插入一个新的元素x，如果i不合理则显示错误信息并退出运行。
@@ -245,7 +284,23 @@ int main(){
 - **C++编码实现**：
 
 ```C++
-
+//在线性表的第position位置插入一个元素，返回插入结果跟错误标志
+int InsertElementByPosition(SequenceList &sequenceList, int position, ElementType element)
+{
+    if (sequenceList.count == 0)
+        return 0; //线性表为空，返回0表示插入失败
+    if (sequenceList.count == sequenceList.size)
+        return 0; //线性表已满，返回0表示插入失败
+    if (position < 1 || position > sequenceList.count)
+        return -1; //-1表示插入位置不合理
+    for (int i = sequenceList.count; i >= position; i--)
+    {
+        sequenceList.data[i] = sequenceList.data[i - 1];
+    }
+    sequenceList.data[position - 1] = element;
+    sequenceList.count += 1;
+    return 1; //插入成功，返回1
+}
 ```
 
 5. 设计一个算法，从顺序表中删除具有给定值x的所有元素。

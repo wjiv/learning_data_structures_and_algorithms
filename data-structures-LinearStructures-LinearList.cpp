@@ -223,60 +223,102 @@ void testLinkList()
 {
 }
 
-//列表合并
-SequenceList mergeList(SequenceList listA, SequenceList listB)
+//原地逆置线性表
+void ReverseList(SequenceList &sequenceList)
 {
-    SequenceList result;
-    result.initList();
-    if (listA.count < listB.count)
+    if (sequenceList.count == 0)
+        return;
+    ElementType tmp;
+    for (int i = 0; i < sequenceList.count / 2; i++)
     {
-        SequenceList tempList = listA;
-        listA = listB;
-        listB = tempList;
+        tmp = sequenceList.data[i];
+        sequenceList.data[i] = sequenceList.data[sequenceList.count - 1 - i];
+        sequenceList.data[sequenceList.count - 1 - i] = tmp;
     }
-    for (int i = 0; i < listA.count + listB.count; i++)
-    {
-        if (i <= listA.count - 1)
-        {
-            result.data[i] = listA.data[i];
-            result.count++;
-        }
-        else
-        {
-            result.data[i] = listB.data[i - listA.count];
-            result.count++;
-        }
-    }
-
-    return result;
 }
 
-//有序列表归并
-bool mergeList(SequenceList listA, SequenceList listB, SequenceList result)
+//从线性表中删除具有最小值的元素，返回被删元素的值及删除结果
+int DeleteElementWithMinValue(SequenceList &sequenceList, ElementType &deleteData)
 {
+    if (sequenceList.count == 0)
+        return 0; //0表示删除失败
+    int minValuePosition = 0;
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] <= sequenceList.data[minValuePosition])
+            minValuePosition = i;
+    }
+    deleteData = sequenceList.data[minValuePosition];
+    sequenceList.data[minValuePosition] = sequenceList.data[sequenceList.count - 1];
+    return 1; //1表示删除成功
+}
 
+//从顺序表第position个位置删除元素，返回删除元素的值以及位置不合理等错误信息
+int DeleteEmementByPosition(SequenceList &sequenceList, int position, ElementType &deleteData)
+{
+    if (sequenceList.count == 0)
+        return 0; //0表示表为空
+    if (position < 1 || position > sequenceList.count)
+        return -1; //-1表示删除位置不合理
+    deleteData = sequenceList.data[position - 1];
+    for (int i = position - 1; i < sequenceList.count; i++)
+    {
+        sequenceList.data[i] = sequenceList.data[i + 1];
+    }
+    sequenceList.count -= 1;
+    return 1; //1表示删除成功
+}
+
+//在线性表的第position位置插入一个元素，返回插入结果跟错误标志
+int InsertElementByPosition(SequenceList &sequenceList, int position, ElementType element)
+{
+    if (sequenceList.count == 0)
+        return 0; //线性表为空，返回0表示插入失败
+    if (sequenceList.count == sequenceList.size)
+        return 0; //线性表已满，返回0表示插入失败
+    if (position < 1 || position > sequenceList.count)
+        return -1; //-1表示插入位置不合理
+    for (int i = sequenceList.count; i >= position; i--)
+    {
+        sequenceList.data[i] = sequenceList.data[i - 1];
+    }
+    sequenceList.data[position - 1] = element;
+    sequenceList.count += 1;
+    return 1; //插入成功，返回1
+}
+
+//从循序表中删除与给定值相同的所有元素
+void DeleteAllEmementsSameGiveElement(SequenceList &sequenceList,ElementType element){
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if(sequenceList.data[i]==element)
+            
+    }
+    
 }
 
 //main函数
 int main()
 {
-    SequenceList listA;
-    SequenceList listB;
-    listA.initList(20);
-    listB.initList(20);
+    SequenceList list;
+    list.initList(20);
     for (int i = 0; i < 10; i++)
     {
-        listA.insert(i, i+1);
+        list.insert(i * i, i + 1);
     }
-    for (int i = 0; i < 15; i++)
-    {
-        listB.insert(i * i, i+1);
-    }
-    listA.print();
-    listB.print();
-    SequenceList result = mergeList(listA, listB);
-
-    result.print();
-
+    list.print();
+    //逆置线性表
+    ReverseList(list);
+    //删除线性表最小元素
+    ElementType deleteData;
+    int flag = DeleteElementWithMinValue(list, deleteData);
+    cout << "删除标志（1：成功；0：失败）：" << flag << "  ; 删除的值为：" << deleteData << endl;
+    list.print();
+    flag = DeleteEmementByPosition(list, 5, deleteData);
+    cout << "删除标志（1：成功；0：表空；-1：删除位置不合理）：" << flag << "  ; 删除的值为：" << deleteData << endl;
+    list.print();
+    flag = InsertElementByPosition(list, 5, 25);
+    cout << "插入标志（1：成功；0：表空或表满；-1：插入失败）：" << flag << endl;
+    list.print();
     return 0;
 }
