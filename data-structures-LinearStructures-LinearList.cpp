@@ -1,3 +1,4 @@
+//线性表部分实现完整代码
 
 // 头文件及名称空间
 
@@ -5,33 +6,25 @@
 using namespace std;
 
 // 公共变量
-const int INIT_SIZE = 100;
-typedef int ElementType;
+const int INIT_SIZE = 100; //最大空间
+typedef int ElementType;   //类型重定义
 
-// 顺序表
-/*顺序表：
-    线性表的顺序存储又称顺序表；
-    顺序表的特点是：逻辑上相邻元素其物理存储也相邻，即顺序表表中元素的逻辑顺序与其物理顺序相同。
-                   顺序表的主要特点是随机访问（访问也称读写），对于查找和更新元素，只要给出索引，即可在O(1)的时间复杂度内找到指定元素位置。
-                   顺序表插入跟删除操作需要移动大量元素，因此其时间复杂度为：O(n)。
-    下面是以顺序表的 C++ 实现 
-*/
+#pragma region 顺序表部分开始
 
 // 顺序表结构
 struct SequenceList
 {
     ElementType *data;
-    int size = 0;                                //表长
-    int count = 0;                               //当前元素个数
+    int size = 0;                                //顺序表空间大小
+    int count = 0;                               //表长（顺序表元素个数）
     void initList();                             //初始化顺序表
     void initList(int length);                   //初始化顺序表
     bool isEmpty();                              //判断顺序表是否为空
     bool insert(ElementType element, int index); //插入元素
     bool deleteElement(int index);               //删除指定位置元素
-    ElementType find(int index);                 //根据位置查找元素
-    //int find(ElementType element);               //查找元素所在位置
-    void update(ElementType e);              //跟新顺序表中元素
-    bool replace(int inddex, ElementType e); //替换指定位置元素
+    bool find(int index, ElementType &element);  //根据位置查找元素
+    int locate(ElementType element);             //查找元素所在位置（按值查找）
+    bool replace(int inddex, ElementType e);     //替换指定位置元素
     void print();
 };
 
@@ -60,14 +53,14 @@ bool SequenceList::insert(ElementType element, int index)
 {
     if (index < 1 || index > count + 1)
         return false;
-    if (count >= size)
+    if (count == size)
         return false;
-    for (int i = count; i >= index - 1; i--)
+    for (int i = count; i >= index; i--)
     {
         data[i] = data[i - 1];
     }
     data[index - 1] = element;
-    count++;
+    count += 1;
     return true;
 }
 
@@ -80,16 +73,44 @@ bool SequenceList::deleteElement(int index)
     {
         data[i - 1] = data[i];
     }
+    count -= 1;
     return true;
 }
 
 //查询指定位置元素
-ElementType SequenceList::find(int index)
+bool SequenceList::find(int index, ElementType &element)
 {
     if (index >= 1 && index <= count)
-        return data[index - 1];
+    {
+        element = data[index - 1];
+        return true;
+    }
     else
-        return -1;
+    {
+        element = NULL;
+        return false;
+    }
+}
+
+//查询指定元素的位置（按值查找元素）：返回顺序表中第一个等于给定值的元素的位置，找不到返回-1
+int SequenceList::locate(ElementType element)
+{
+    for (int i = 0; i < count; i++)
+    {
+        if (data[i] == element)
+            return i + 1;
+    }
+    return -1;
+}
+
+//替换顺序表中指定位置元素的值
+
+bool SequenceList::replace(int index, ElementType element)
+{
+    if (index < 1 || index > count)
+        return false; //位置不合法
+    data[index - 1] = element;
+    return true;
 }
 
 //遍历顺序表
@@ -104,31 +125,76 @@ void SequenceList::print()
     cout << endl;
 }
 
-//测试函数
-void test()
+//顺序表测试函数
+void testSequenceList()
 {
     SequenceList list;
     list.initList(200);
+    cout << "为顺序表list分配的存储空间大小为：" << list.size << endl;
+    cout << "依次插入1——100共100个整数后，顺序表元素为：" << endl;
     for (int i = 0; i < 100; i++)
     {
         list.insert(i + 1, i + 1);
     }
-
-    cout << list.insert(2, 101) << endl;
-
     list.print();
+    cout << "当前顺序表表长为：" << list.count << endl;
+    cout << "在第1号位置插入2020，在第25号位置插入4，在100号位置插入1024，顺序表元素为：" << endl;
+    list.insert(2020, 1);
+    list.insert(4, 25);
+    list.insert(1024, 100);
+    list.print();
+    list.deleteElement(1);
+    list.deleteElement(50);
+    list.deleteElement(100);
+    cout << "删除顺序表第1，50，100号位置的元素，顺序表表长为：" << list.count << endl;
+    cout << "顺序表元素为：" << endl;
+    list.print();
+    cout << "查找第10，30，60号位置的元素的值，分别为：" << endl;
+    ElementType e;
+    if (list.find(10, e))
+        cout << "第10号元素查找成功，值为：" << e << endl;
+    else
+        cout << "第10号元素查找失败！" << e << endl;
+
+    if (list.find(30, e))
+        cout << "第30号元素查找成功，值为：" << e << endl;
+    else
+        cout << "第30号元素查找失败！" << e << endl;
+    if (list.find(60, e))
+        cout << "第60号元素查找成功，值为：" << e << endl;
+    else
+        cout << "第60号元素查找失败！" << e << endl;
+    cout << "替换第55，66，77，号位置元素分别为 8,15,22后，顺序表list的元素为：" << endl;
+    list.replace(55, 8);
+    list.replace(66, 15);
+    list.replace(77, 22);
+    list.print();
+    cout << "查找值为8，15，22的元素第一次出现的位置：" << endl;
+    int location = 0;
+    location = list.locate(8);
+    if (location <= 0)
+        cout << "值为8的元素没找到！";
+    else
+        cout << "值为8的元素在顺序表中第一次出现的位置为：" << location << endl;
+    location = list.locate(15);
+    if (location <= 0)
+        cout << "值为15的元素没找到！";
+    else
+        cout << "值为15的元素在顺序表中第一次出现的位置为：" << location << endl;
+    location = list.locate(22);
+    if (location <= 0)
+        cout << "值为22的元素没找到！";
+    else
+        cout << "值为22的元素在顺序表中第一次出现的位置为：" << location << endl;
+    cout << "当前顺序表list的元素为：" << endl;
+    list.print();
+    cout << "测试结束！" << endl;
 }
 
-/*单链表：
-    线性表的链式存储又称单链表；
-    头指针：头指针用来表示一个单链表，头指针为NULL时表示链表为空。
-    头结点：为了方便操作，在单链表的第一个结点之前附加一个结点，称之为头结点，头结点只包含指针域。
-    单链表的特点是：对于链表，逻辑上相邻的元素其物理存储不要求相邻，即链表中的元素是离散分布在存储单元中的。因此链表是非随机存取的存储结构。
-                在链表中，每个结点的指针都指向其逻辑顺序的后一个元素的地址。                    
-    下面是以单链表的 C++ 实现 
-*/
+#pragma endregion 顺序表部分结束
 
-// 单链表结点定义
+#pragma region 单链表开始
+
 struct ListNode
 {
     ElementType data;
@@ -223,6 +289,9 @@ void testLinkList()
 {
 }
 
+#pragma endregion 单链表部分结束
+
+#pragma region 公共算法部分开始
 //原地逆置线性表
 void ReverseList(SequenceList &sequenceList)
 {
@@ -288,37 +357,43 @@ int InsertElementByPosition(SequenceList &sequenceList, int position, ElementTyp
 }
 
 //从循序表中删除与给定值相同的所有元素
-void DeleteAllEmementsSameGiveElement(SequenceList &sequenceList,ElementType element){
-    for (int i = 0; i < sequenceList.count; i++)
-    {
-        if(sequenceList.data[i]==element)
-            
-    }
-    
-}
+// void DeleteAllEmementsSameGiveElement(SequenceList &sequenceList, ElementType element)
+// {
+//     for (int i = 0; i < sequenceList.count; i++)
+//     {
+//         if (sequenceList.data[i] == element)
+//     }
+// }
 
+#pragma endregion 公共算法部分结束
+
+#pragma region main函数部分
 //main函数
 int main()
 {
-    SequenceList list;
-    list.initList(20);
-    for (int i = 0; i < 10; i++)
-    {
-        list.insert(i * i, i + 1);
-    }
-    list.print();
-    //逆置线性表
-    ReverseList(list);
-    //删除线性表最小元素
-    ElementType deleteData;
-    int flag = DeleteElementWithMinValue(list, deleteData);
-    cout << "删除标志（1：成功；0：失败）：" << flag << "  ; 删除的值为：" << deleteData << endl;
-    list.print();
-    flag = DeleteEmementByPosition(list, 5, deleteData);
-    cout << "删除标志（1：成功；0：表空；-1：删除位置不合理）：" << flag << "  ; 删除的值为：" << deleteData << endl;
-    list.print();
-    flag = InsertElementByPosition(list, 5, 25);
-    cout << "插入标志（1：成功；0：表空或表满；-1：插入失败）：" << flag << endl;
-    list.print();
+    // SequenceList list;
+    // list.initList(20);
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     list.insert(i * i, i + 1);
+    // }
+    // list.print();
+    // //逆置线性表
+    // ReverseList(list);
+    // //删除线性表最小元素
+    // ElementType deleteData;
+    // int flag = DeleteElementWithMinValue(list, deleteData);
+    // cout << "删除标志（1：成功；0：失败）：" << flag << "  ; 删除的值为：" << deleteData << endl;
+    // list.print();
+    // flag = DeleteEmementByPosition(list, 5, deleteData);
+    // cout << "删除标志（1：成功；0：表空；-1：删除位置不合理）：" << flag << "  ; 删除的值为：" << deleteData << endl;
+    // list.print();
+    // flag = InsertElementByPosition(list, 5, 25);
+    // cout << "插入标志（1：成功；0：表空或表满；-1：插入失败）：" << flag << endl;
+    // list.print();
+    // return 0;
+    testSequenceList(); //顺序表测试函数
     return 0;
 }
+
+#pragma endregion main函数部分结束
