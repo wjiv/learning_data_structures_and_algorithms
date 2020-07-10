@@ -19,16 +19,18 @@ double RecursiveCalculateFactorial(double x)
 }
 
 //“百钱买百鸡”问题
-void HundredChickensWithHundredDollars(int cockPrice, int henPrice, int chickPrice, int &cockNum, int &henNum, int &chickNum)
+void HundredChickensWithHundredDollars()
 {
-    for (cockNum = 0; cockNum <= 100; cockNum++)
+    for (int x = 0; x <= 100; x++)
     {
-        for (henNum = 0; henNum <= 100; henNum++)
+        for (int y = 0; y <= 100; y++)
         {
-            for (chickNum = 0; chickNum <= 100; chickNum++)
+            for (int z = 0; z <= 100; z++)
             {
-                if (cockNum + henNum + chickNum == 100 && cockPrice * cockNum + henPrice * henNum + chickPrice * chickNum == 100)
-                    break;
+                if (x + y + z == 100 && 5 * x + 3 * y + z / 3 == 100)
+                {
+                    cout << "公鸡数：" << x << " ；母鸡数：" << y << " ；小鸡数：" << z << endl;
+                }
             }
         }
     }
@@ -39,7 +41,11 @@ void PrintArrayElementsForwardRecursively(int *arr, int length, int index)
 {
     if (index >= length)
         return;
-    cout << arr[index] << endl;
+    if (index != 0)
+        cout << " ";
+    else
+        cout << endl;
+    cout << arr[index];
     PrintArrayElementsForwardRecursively(arr, length, index + 1);
 }
 
@@ -49,17 +55,25 @@ void PrintArrayElementsBackwardRecursively(int *arr, int length, int index)
     if (index >= length)
         return;
     PrintArrayElementsBackwardRecursively(arr, length, index + 1);
-    cout << arr[index] << endl;
+    if (index != length - 1)
+        cout << " ";
+    else
+        cout << endl;
+    cout << arr[index];
 }
 
 //main函数
 int main()
 {
     cout << RecursiveCalculateFactorial(1) << endl;
-    int cockNum = 0;
-    int henNum = 0;
-    int chickNum = 0;
-    HundredChickensWithHundredDollars(5, 3, 1 / 3, cockNum, henNum, chickNum);
-    cout << cockNum << " " << henNum << " " << chickNum << endl;
+
+    HundredChickensWithHundredDollars();
+
+    int arr[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    PrintArrayElementsForwardRecursively(arr, 10, 0);
+
+    PrintArrayElementsBackwardRecursively(arr, 10, 0);
+
     return 0;
 }
