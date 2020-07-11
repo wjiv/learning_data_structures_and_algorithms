@@ -3,6 +3,7 @@
 // 头文件及名称空间
 
 #include <iostream>
+
 using namespace std;
 
 // 公共变量
@@ -31,14 +32,14 @@ struct SequenceList
 // 初始化顺序表
 void SequenceList::initList()
 {
-    data = new ElementType(INIT_SIZE);
+    data = new ElementType[INIT_SIZE];
     size = INIT_SIZE;
 }
 
 // 初始化顺序表
 void SequenceList::initList(int length)
 {
-    data = new ElementType(length);
+    data = new ElementType[length];
     size = length;
 }
 
@@ -558,56 +559,382 @@ int DeleteEmementByPosition(SequenceList &sequenceList, int position, ElementTyp
     return 1; //1表示删除成功
 }
 
-//在线性表的第position位置插入一个元素，返回插入结果跟错误标志
-int InsertElementByPosition(SequenceList &sequenceList, int position, ElementType element)
+//在线性表的第i个位置插入一个元素，返回插入结果跟错误标志
+int InsertElementByPosition(SequenceList &sequenceList, int index, ElementType element)
 {
     if (sequenceList.count == 0)
         return 0; //线性表为空，返回0表示插入失败
     if (sequenceList.count == sequenceList.size)
         return 0; //线性表已满，返回0表示插入失败
-    if (position < 1 || position > sequenceList.count)
+    if (index < 1 || index > sequenceList.count)
         return -1; //-1表示插入位置不合理
-    for (int i = sequenceList.count; i >= position; i--)
+    for (int i = sequenceList.count; i >= index; i--)
     {
         sequenceList.data[i] = sequenceList.data[i - 1];
     }
-    sequenceList.data[position - 1] = element;
+    sequenceList.data[index - 1] = element;
     sequenceList.count += 1;
     return 1; //插入成功，返回1
 }
 
-//从循序表中删除与给定值相同的所有元素
-// void DeleteAllEmementsSameGiveElement(SequenceList &sequenceList, ElementType element)
-// {
-//     for (int i = 0; i < sequenceList.count; i++)
-//     {
-//         if (sequenceList.data[i] == element)
-//     }
-// }
+//从顺序表中删除具有给定值x的所有元素。
+void RemoveAllValuesEqualGiveValue(SequenceList &sequenceList, ElementType element)
+{
+    int tmp = 0;
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] != element)
+        {
+            if (tmp != i)
+                sequenceList.data[tmp] = sequenceList.data[i];
+            tmp++;
+        }
+    }
+    sequenceList.count = tmp;
+}
+
+//从顺序表中删除其值在给定值s与t（s <= t）之间的所有元素，如果顺序表为空，则显示错误信息并退出运行。
+int RemoveAllValuesInGiveRange(SequenceList &sequenceList, ElementType lowerBound, ElementType upperBound)
+{
+    if (sequenceList.count == 0)
+        return 0;
+    if (lowerBound > upperBound)
+    {
+        ElementType tmpBound = upperBound;
+        upperBound = lowerBound;
+        lowerBound = tmpBound;
+    }
+    int tmp = 0;
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] < lowerBound || sequenceList.data[i] > upperBound)
+        {
+            if (tmp != i)
+                sequenceList.data[tmp] = sequenceList.data[i];
+            tmp++;
+        }
+    }
+    sequenceList.count = tmp;
+    return 1;
+}
+
+//设计一个算法，从有序顺序表中删除其值在给定值s与t（s <= t）之间的所有元素，如果顺序表为空，则显示错误信息并退出运行。
+int RemoveAllSequenceListValuesInGiveRange(SequenceList &sequenceList, ElementType lowerBound, ElementType upperBound)
+{
+    if (sequenceList.count == 0)
+        return 0;
+    if (lowerBound > upperBound)
+    {
+        ElementType tmpBound = upperBound;
+        upperBound = lowerBound;
+        lowerBound = tmpBound;
+    }
+    int tmp = 0;
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] <= lowerBound || sequenceList.data[i] >= upperBound)
+        {
+            if (tmp != i)
+                sequenceList.data[tmp] = sequenceList.data[i];
+            tmp++;
+        }
+    }
+    sequenceList.count = tmp;
+    return 1;
+}
+
+// 设计一个算法，将两个有序顺序表合并成一个新的有序顺序表并由函数返回结果顺序表。
+int MergeSequenceList(SequenceList sequenceListA, SequenceList sequenceListB, SequenceList &result)
+{
+    if (result.size < sequenceListA.count + sequenceListB.count)
+        return 0;
+    int count1 = 0;
+    int count2 = 0;
+    int count3 = 0;
+    while (count1 < sequenceListA.count && count2 < sequenceListB.count)
+    {
+        if (sequenceListA.data[count1] <= sequenceListB.data[count2])
+        {
+            result.data[count3] = sequenceListA.data[count1];
+            count3++;
+            count1++;
+        }
+        else
+        {
+            result.data[count3] = sequenceListB.data[count2];
+            count3++;
+            count2++;
+        }
+    }
+    while (count1 < sequenceListA.count)
+    {
+        result.data[count3] = sequenceListA.data[count1];
+        count3++;
+        count1++;
+    }
+    while (count2 < sequenceListB.count)
+    {
+        result.data[count3] = sequenceListB.data[count2];
+        count3++;
+        count2++;
+    }
+    result.count = count3;
+    return 1;
+}
+
+//设计一个算法，从有序顺序表中删除所有其值重复的元素，使表中所有元素的值均不相同。
+int DeleteRepeatValuesFromSequenceList(SequenceList &sequenceList)
+{
+    if (sequenceList.count == 0)
+        return 0;
+    int tmp = 1;
+    for (int i = 1; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i - 1] != sequenceList.data[i])
+        {
+            if (tmp != i)
+                sequenceList.data[tmp] = sequenceList.data[i];
+            tmp++;
+        }
+    }
+    sequenceList.count = tmp;
+    return true;
+}
+
+//设计一个算法，以不多于 3n/2的平均比较次数，在一个有n个整数的顺序表A中找出具有最大值和最小值的整数。
+int FindMaximumValueAndMinimumValue(SequenceList sequenceList, ElementType &maxValue, ElementType &minValue)
+{
+    if (sequenceList.count == 0)
+        return 0;
+    maxValue = minValue = sequenceList.data[0];
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] > maxValue)
+            maxValue = sequenceList.data[i];
+        else if (sequenceList.data[i] < minValue)
+            minValue = sequenceList.data[i];
+    }
+    return 1;
+}
+
+/* 设$A=(a_1,a_2,\cdots,a_{n-1},a_n)$和$B=(b_1,b_2,\cdots,b_{n-1},b_n)$均为顺序表，
+    $A^{'}$和$B^{'}$分别是除去最大公共前缀子串后的子表。如A=('b','e','i','j','i','n','g')，
+    B=('b','e','i','f','a','n','g')，则两者的最大公共前缀为'b','e','i'，在两个顺序表中除去
+    最大公共前缀的子表分别为A'=('j','i','n','g')，B'=('f','a','n','g')。若A'=B'=空表，则A=B；
+    若A'=空表且B'$\neq$空表，或两者均不空且A'的第一个元素值小于B'的第一个元素的值，则A$\lt$B，
+    否则A$\gt$B。设计一个算法根据上述方法比较A和B的大小。*/
+char CompareSequenceListWithSubList(SequenceList sequenceListA, SequenceList sequenceListB)
+{
+    int count = 0;
+    while (count < sequenceListA.count && count < sequenceListB.count)
+    {
+        if (sequenceListA.data[count] == sequenceListB.data[count])
+            count++;
+        else
+            break;
+    }
+    if (count >= sequenceListA.count && count >= sequenceListB.count)
+        return '=';
+    if (count >= sequenceListA.count || sequenceListA.data[count] < sequenceListB.data[count])
+        return '<';
+    else
+        return '>';
+}
+
+//设计一个算法，在带头结点的单链表中寻找第i(i >= 1)。若找到，则返回第i个结点的地址；若找不到，则返回NULL。
+
+//设计一个算法，在带头结点的单链表中确定值最大的结点。
+
+//设计一个算法，统计带头结点的单链表中具有给定值x的所有元素数。
+
+//设计一个算法，根据一维数组A\[n]建立一个带头结点的单链表，使单链表中各个元素的次序与A\[n]中各元素的次序相同，要求该程序的时间复杂度为O(n)。
+
+//设计一个算法，在非递减有序的带头结点的单链表中删除值相同的多余结点。
+
+/*已知L为不带头结点的单链表的表头指针，链表中存储的都是整型数据，试写出下列运算的递归算法：
+
+    (1). 求链表中的最大整数；
+
+    (2). 求链表结点的个数;
+
+    (3). 求链表所有元素的平均值。
+*/
+
+//设ha和hb分别是两个带头结点的非递减有序单链表的表头指针，设计一个算法，将这个两个有序链表合并成一个非递增的单链表。要求结果链表仍使用原来两个链表的存储空间，不另外占用其他的存储空间。表中允许出现重复的数据。
+
+//设有一个表头指针为h的单链表。设计一个算法，通过一次遍历，将链表中的所有结点的指针的链接方向逆转。
+
+//设在一个带头结点的单链表中所有元素结点的数据值按递增顺序排列，设计一个算法，删除所有大于min且小于max的元素结点（若存在）。
+
+//根据一个结点数据为整型的单链表创建两个单链表，使得第一个单链表中包含原单链表中所有数值为奇数的结点，第二个单链表中包含原单链表中所有数据为偶数的结点，原有单链表保持不变。
+
+//已知一个带头结点的单链表中包含3类字符（数字字符，字母字符和其他字符），设计一个算法，构造3个新的单链表，使得每个单链表中只包含同一类字符。要求使用原来的空间，表头结点可以另辟空间。
+
+//设计一个算法,将一个带头结点的单循环链表中所有结点的链接方向逆转。
+
+//设有一个带头结点的非空双向循环链表L，指针p指向链表中第一个元素值为x的结点，设计一个算法，从链表中删除*p结点。
+
+//设计一个算法，逆转带头结点的双向循环链表中所有结点的链接方向。
+
+//设计一个算法，改造一个带头结点的双向链表，所有结点的原有次序保持在各结点的rLink域中，而lLink域把所有结点按照其值从小到大的顺序链接起来。
+
+//设以带头结点的双向循环链表表示线性表L=（$a_1,a_2,\cdots ,a_{n-1},a_n$）。设计一个时间复杂度为O(n)的算法，将L改造为L=（$a_1,a_3,\cdots ,a_n, \cdots ,a_4,a_2$）。
+
+/*设计一个实现下属要求的Locate运算函数。设有一个带头结点双向链表L，每个结点有4个数据成员：
+    指向前驱结点的指针lLink，指向后继节点的指针rLink，存放数据的成员data和访问频度frequency。
+    所有结点的frequency初始时都为0。每当在链表上进行一次Locate(x)操作时，令元素值x结点的访问
+    频度frequency加1，并将该结点前移，链接到与它的访问频度相等的结点后面，使得链表中所有结点
+    保持按访问品读递减的顺序排列，以使频繁访问的结点总是靠近表头。*/
+
+/*设n个人围坐在圆桌周围，现在从第s个人开始报数，报到第m个人让他出局；然后从出局者的下一个人开始从新报数，数到第m个人，再让他出局....如此反复，直到所有的人全部出局为止。对于任意给定的n,s,m,求出这n个人的出局序列。以n=9,s=1,m=5为例验证。
+
+    （1）. 若用整数序列1，2，3，...，n表示顺序围坐在圆桌周围的人，设计一个算法用一维数组表示作为求解过程中使用的数据结构，解决上述问题。
+
+    （2）. 采用带头结点的单循环链表作为求解过程中使用的数据结构，设计一个算法，解决上述问题。
+
+    （3）. 采用带头结点的双向循环链表作为求解过程中使用的数据结构，设计一个算法，解决上述问题。*/
+
+//设计一个算法，求两个用（01）向量表示的集合A和集合B的并，通过第3个用（01）向量表示的集合C返回运算结果，A和B的原有内容保持不变。
+
+//设计一个算法，求两个用（01）向量表示的集合A和集合B的交，通过第3个用（01）向量表示的集合C返回运算结果，A和B的原有内容保持不变。
+
+//设计一个算法，求两个用（01）向量表示的集合A和集合B的差，通过第3个用（01）向量表示的集合C返回运算结果，A和B的原有内容保持不变。
+
+//设计一个算法，求两个用有序链表表示的集合A和集合B的并，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
+
+//设计一个算法，求两个用有序链表表示的集合A和集合B的交，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
+
+//设计一个算法，求两个用有序链表表示的集合A和集合B的差，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
+
+//若采用数组来存储一元多项式的系数，即用数组的第i个元素存放多项式的第i次幂项的系数，如对于一元多项式 $f(x) = 6x^6 + 7x^4 - 10x^2 + 5x +3$。设计两个算法，分别求一元多项式的和跟乘积。
+
+//设计一个算法，输入一元多项式的系数跟指数，按照指数降幂的方式建立多项式链表。如果输入的指数与链表中已有的某一项的指数相等，则新的项不加入，并报告作废信息。整个输入序列以输入系数为0标志结束。
+
+/*设对于一个一元多项式 $P(x) = a_{m-1}x^{e_{m-1}} + a_{m-2}x^{e_{m-2}} + \cdots + a_{0}x^{e_{0}}$ ，用表长为m的带有头结点的单链表表示为 $(t_{m-1} , t_{m-2} , \cdots , t_1, t_0)$ 。其中，m是多项式 $P(x)$ 中非0项的个数，每一个 $t_i(0 \leq t_i \leq m-1)$ 是 $P(x)$ 的一个非0项，各个项按指数 $e_i$ 递减顺序排列： $e_{m-1} \gt e_{m-2} \gt \cdots \gt e_0 \gt 0$ 。
+    
+    （1）. 设计一个一元多项式插入新项的算法Insert。该算法的功能是：如果多项式中没有与新项指数相等的项，则将此项插入到多项式链表的适当位置；如果多项式中已有与新项指数相同的项，则将它们合并。
+
+    （2）. 利用（1）中的插入算法，设计一个实现一元多项式乘法的算法。*/
+
+//设计一个算法，按照降幂的次序输出一个一元多项式。
+
+//用带头结点的单链表表示一个一元多项式，链表中的结点按幂指数降序链接。设计一个算法，将表示一元多项式的单链表就地逆置，改为按幂指数升序链接。
+
+//用带头结点的单链表表示一个一元多项式，试设计一个算法，计算多项式A在x处的值。
+
+//类似用数组表示一元多项式，可用二维数组A表示二元多项式，数组元素A\[i]\[j]表示多项式中 $x^i$ 和 $y^j$ 的系数。试设计一个算法，把用二维数组表示的二元多项式以常规多项式的形式按升幂顺序输出。对于多项式的每一项 $c_kx^iy^j$ 可以打印成 $c_k$x^iy^j ，其中 $c_k$ ，i 和 j用实际值输出。当 $c_k$ ， i ， j 的值为1时，可以不显示 $c_k$ ，i ， j ，^ 。
 
 //线性表相关算法测试
-void testLinearListAlgorithms(){
-    // SequenceList list;
-    // list.initList(20);
-    // for (int i = 0; i < 10; i++)
-    // {
-    //     list.insert(i * i, i + 1);
-    // }
-    // list.print();
-    // //逆置线性表
-    // ReverseList(list);
-    // //删除线性表最小元素
-    // ElementType deleteData;
-    // int flag = DeleteElementWithMinValue(list, deleteData);
-    // cout << "删除标志（1：成功；0：失败）：" << flag << "  ; 删除的值为：" << deleteData << endl;
-    // list.print();
-    // flag = DeleteEmementByPosition(list, 5, deleteData);
-    // cout << "删除标志（1：成功；0：表空；-1：删除位置不合理）：" << flag << "  ; 删除的值为：" << deleteData << endl;
-    // list.print();
-    // flag = InsertElementByPosition(list, 5, 25);
-    // cout << "插入标志（1：成功；0：表空或表满；-1：插入失败）：" << flag << endl;
-    // list.print();
-    // return 0;
+void testLinearListAlgorithms()
+{
+    SequenceList sequenceList;
+    sequenceList.initList(20);
+    for (int i = 0; i < 10; i++)
+    {
+        sequenceList.insert(i * i, i + 1);
+    }
+    sequenceList.print();
+    //逆置线性表
+    ReverseList(sequenceList);
+    cout << "原地逆置线性表——逆置后的顺序表如下：" << endl;
+    sequenceList.print();
+    //删除线性表中的具有最小值的元素
+    cout << "删除线性表中具有最小值元素：" << endl;
+    ElementType deleteData;
+    int flag = -1;
+    flag = DeleteElementWithMinValue(sequenceList, deleteData);
+    cout << "删除标志（1：成功；0：失败）：" << flag << "  ; 删除的值为：" << deleteData << " ；当前表长为：" << sequenceList.count << endl;
+    sequenceList.print();
+    //删除顺序表中指定位置的元素
+    cout << "删除线性表中指定位置的元素：" << endl;
+    flag = DeleteEmementByPosition(sequenceList, 5, deleteData);
+    cout << "删除标志（1：成功；0：表空；-1：删除位置不合理）：" << flag << "  ; 删除的值为：" << deleteData << " ；当前表长为：" << sequenceList.count << endl;
+    sequenceList.print();
+    //向顺序表指定位置插入元素
+    cout << "向顺序表指定位置插入元素：" << endl;
+    flag = InsertElementByPosition(sequenceList, 5, 25);
+    cout << "插入标志（1：成功；0：表空或表满；-1：插入失败）：" << flag << " ；当前表长为：" << sequenceList.count << endl;
+    sequenceList.print();
+    InsertElementByPosition(sequenceList, 2, 36);
+    InsertElementByPosition(sequenceList, 4, 49);
+    InsertElementByPosition(sequenceList, 6, 36);
+    InsertElementByPosition(sequenceList, 8, 81);
+    InsertElementByPosition(sequenceList, 10, 36);
+    sequenceList.print();
+    //删除顺序表中与给定元素值相等的所有元素
+    RemoveAllValuesEqualGiveValue(sequenceList, 36);
+    cout << "删除与36相等的所有元素后，顺序表元素为：" << endl;
+    sequenceList.print();
+    cout << "顺序表表长为：" << sequenceList.count << endl;
+    //删除顺序表中元素位于给定范围的元素
+    RemoveAllValuesInGiveRange(sequenceList, 20, 60);
+    cout << "删除顺序表中元素大于20且小于60的元素后，顺序表元素为：" << endl;
+    sequenceList.print();
+    cout << "顺序表表长为：" << sequenceList.count << endl;
+    SequenceList sequenceListA;
+    sequenceListA.initList(20);
+    for (int i = 0; i < 10; i++)
+    {
+        sequenceListA.insert(i + 1, i + 1);
+    }
+    //删除有序顺序表中元素介于给定范围的元素
+    RemoveAllSequenceListValuesInGiveRange(sequenceListA, 2, 6);
+    cout << "删除顺序表中元素大于2且小于6的元素后，顺序表元素为：" << endl;
+    sequenceListA.print();
+    cout << "顺序表表长为：" << sequenceListA.count << endl;
+    //合并有序顺序表
+    SequenceList sequenceListB;
+    sequenceListB.initList(20);
+    for (int i = 0; i < 10; i++)
+    {
+        sequenceListB.insert(3 * (i + 1), i + 1);
+    }
+    SequenceList mergeResult;
+    mergeResult.initList(20);
+    MergeSequenceList(sequenceListA, sequenceListB, mergeResult);
+    cout << "两个有序 顺序表合并（假设合并后从小到大排列）后，元素为：" << endl;
+    mergeResult.print();
+    //顺序表去重
+    sequenceListA.replace(3, 2);
+    sequenceListA.replace(5, 7);
+    sequenceListA.print();
+    cout << "删除有序顺序表中重复的元素（删除顺序表B中值为30的元素，只保留一个）：" << endl;
+    DeleteRepeatValuesFromSequenceList(sequenceListA);
+    sequenceListA.print();
+    //找出顺序表中的最值
+    cout << "找出顺序表B中的最大值：" << endl;
+    cout << "顺序表B的元素为：" << endl;
+    sequenceListB.print();
+    ElementType maxValue;
+    ElementType minValue;
+    FindMaximumValueAndMinimumValue(sequenceListB, maxValue, minValue);
+    cout << "顺序表B中，最大值是：" << maxValue << " ；最小值是：" << minValue << endl;
+    //根据除去最大公共前缀子串后的顺序表比较顺序表大小
+    //注意，这里比较函数的验证需要把ElementType改为Char类型
+    // SequenceList sequenceListA;
+    // SequenceList sequenceListB;
+    // sequenceListA.initList(10);
+    // sequenceListB.initList(10);
+    // sequenceListA.insert('b', 1);
+    // sequenceListA.insert('e', 2);
+    // sequenceListA.insert('i', 3);
+    // sequenceListA.insert('j', 4);
+    // sequenceListA.insert('i', 5);
+    // sequenceListA.insert('n', 6);
+    // sequenceListA.insert('g', 7);
+    // sequenceListB.insert('b', 1);
+    // sequenceListB.insert('e', 2);
+    // sequenceListB.insert('i', 3);
+    // sequenceListB.insert('f', 4);
+    // sequenceListB.insert('a', 5);
+    // sequenceListB.insert('n', 6);
+    // sequenceListB.insert('g', 7);
+    // cout << "字符顺序表A元素为：" << endl;
+    // sequenceListA.print();
+    // cout << "字符顺序表B元素为：" << endl;
+    // sequenceListB.print();
+    // char compareChar = CompareSequenceListWithSubList(sequenceListA, sequenceListB);
+    // cout << "字符顺序表A与顺序表B的比较结果为：顺序表A" << compareChar << "顺序表B！" << endl;
 }
 
 #pragma endregion 线性表相关算法部分结束
@@ -619,7 +946,7 @@ int main()
 {
     // testSequenceList(); //顺序表测试函数
     // testLinkList(); //单链表测试函数
-    // testLinearListAlgorithms(); //线性表相关算法测试函数
+    testLinearListAlgorithms(); //线性表相关算法测试函数
     return 0;
 }
 

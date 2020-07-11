@@ -85,31 +85,30 @@ typedef int ElementType;
 struct SequenceList
 {
     ElementType *data;
-    int size = 0;                                //表长
-    int count = 0;                               //当前元素个数
+    int size = 0;                                //顺序表空间大小
+    int count = 0;                               //表长（顺序表元素个数）
     void initList();                             //初始化顺序表
     void initList(int length);                   //初始化顺序表
     bool isEmpty();                              //判断顺序表是否为空
     bool insert(ElementType element, int index); //插入元素
     bool deleteElement(int index);               //删除指定位置元素
-    ElementType find(int index);                 //根据位置查找元素
-    //int find(ElementType element);               //查找元素所在位置
-    void update(ElementType e);              //跟新顺序表中元素
-    bool replace(int inddex, ElementType e); //替换指定位置元素
+    bool find(int index, ElementType &element);  //根据位置查找元素
+    int locate(ElementType element);             //查找元素所在位置（按值查找）
+    bool replace(int inddex, ElementType e);     //替换指定位置元素
     void print();
 };
 
 // 初始化顺序表
 void SequenceList::initList()
 {
-    data = new ElementType(INIT_SIZE);
+    data = new ElementType[INIT_SIZE];
     size = INIT_SIZE;
 }
 
 // 初始化顺序表
 void SequenceList::initList(int length)
 {
-    data = new ElementType(length);
+    data = new ElementType[length];
     size = length;
 }
 
@@ -124,14 +123,14 @@ bool SequenceList::insert(ElementType element, int index)
 {
     if (index < 1 || index > count + 1)
         return false;
-    if (count >= size)
+    if (count == size)
         return false;
-    for (int i = count; i >= index - 1; i--)
+    for (int i = count; i >= index; i--)
     {
         data[i] = data[i - 1];
     }
     data[index - 1] = element;
-    count++;
+    count += 1;
     return true;
 }
 
@@ -144,16 +143,44 @@ bool SequenceList::deleteElement(int index)
     {
         data[i - 1] = data[i];
     }
+    count -= 1;
     return true;
 }
 
 //查询指定位置元素
-ElementType SequenceList::find(int index)
+bool SequenceList::find(int index, ElementType &element)
 {
     if (index >= 1 && index <= count)
-        return data[index - 1];
+    {
+        element = data[index - 1];
+        return true;
+    }
     else
-        return -1;
+    {
+        element = (ElementType)NULL;
+        return false;
+    }
+}
+
+//查询指定元素的位置（按值查找元素）：返回顺序表中第一个等于给定值的元素的位置，找不到返回-1
+int SequenceList::locate(ElementType element)
+{
+    for (int i = 0; i < count; i++)
+    {
+        if (data[i] == element)
+            return i + 1;
+    }
+    return -1;
+}
+
+//替换顺序表中指定位置元素的值
+
+bool SequenceList::replace(int index, ElementType element)
+{
+    if (index < 1 || index > count)
+        return false; //位置不合法
+    data[index - 1] = element;
+    return true;
 }
 
 //遍历顺序表
@@ -168,24 +195,76 @@ void SequenceList::print()
     cout << endl;
 }
 
-//测试函数
-void test()
+//顺序表测试函数
+void testSequenceList()
 {
     SequenceList list;
     list.initList(200);
+    cout << "顺序表测试：" << endl;
+    cout << "为顺序表list分配的存储空间大小为：" << list.size << endl;
+    cout << "依次插入1——100共100个整数后，顺序表元素为：" << endl;
     for (int i = 0; i < 100; i++)
     {
         list.insert(i + 1, i + 1);
     }
-
-    cout << list.insert(2, 101) << endl;
-
     list.print();
+    cout << "当前顺序表表长为：" << list.count << endl;
+    cout << "在第1号位置插入2020，在第25号位置插入4，在100号位置插入1024，顺序表元素为：" << endl;
+    list.insert(2020, 1);
+    list.insert(4, 25);
+    list.insert(1024, 100);
+    list.print();
+    list.deleteElement(1);
+    list.deleteElement(50);
+    list.deleteElement(100);
+    cout << "删除顺序表第1，50，100号位置的元素，顺序表表长为：" << list.count << endl;
+    cout << "顺序表元素为：" << endl;
+    list.print();
+    cout << "查找第10，30，60号位置的元素的值，分别为：" << endl;
+    ElementType e;
+    if (list.find(10, e))
+        cout << "第10号元素查找成功，值为：" << e << endl;
+    else
+        cout << "第10号元素查找失败！" << e << endl;
+
+    if (list.find(30, e))
+        cout << "第30号元素查找成功，值为：" << e << endl;
+    else
+        cout << "第30号元素查找失败！" << e << endl;
+    if (list.find(60, e))
+        cout << "第60号元素查找成功，值为：" << e << endl;
+    else
+        cout << "第60号元素查找失败！" << e << endl;
+    cout << "替换第55，66，77，号位置元素分别为 8,15,22后，顺序表list的元素为：" << endl;
+    list.replace(55, 8);
+    list.replace(66, 15);
+    list.replace(77, 22);
+    list.print();
+    cout << "查找值为8，15，22的元素第一次出现的位置：" << endl;
+    int location = 0;
+    location = list.locate(8);
+    if (location <= 0)
+        cout << "值为8的元素没找到！";
+    else
+        cout << "值为8的元素在顺序表中第一次出现的位置为：" << location << endl;
+    location = list.locate(15);
+    if (location <= 0)
+        cout << "值为15的元素没找到！";
+    else
+        cout << "值为15的元素在顺序表中第一次出现的位置为：" << location << endl;
+    location = list.locate(22);
+    if (location <= 0)
+        cout << "值为22的元素没找到！";
+    else
+        cout << "值为22的元素在顺序表中第一次出现的位置为：" << location << endl;
+    cout << "当前顺序表list的元素为：" << endl;
+    list.print();
+    cout << "顺序表测试结束！" << endl;
 }
 
 //main函数
 int main(){
-    test();
+    testSequenceList();
     return 0;
 }
 ```
@@ -275,6 +354,7 @@ int DeleteEmementByPosition(SequenceList &sequenceList, int position, ElementTyp
     {
         sequenceList.data[i] = sequenceList.data[i + 1];
     }
+    sequenceList.count -= 1;
     return 1; //1表示删除成功
 }
 ```
@@ -284,20 +364,20 @@ int DeleteEmementByPosition(SequenceList &sequenceList, int position, ElementTyp
 - **C++编码实现**：
 
 ```C++
-//在线性表的第position位置插入一个元素，返回插入结果跟错误标志
-int InsertElementByPosition(SequenceList &sequenceList, int position, ElementType element)
+//在线性表的第i个位置插入一个元素，返回插入结果跟错误标志
+int InsertElementByPosition(SequenceList &sequenceList, int index, ElementType element)
 {
     if (sequenceList.count == 0)
         return 0; //线性表为空，返回0表示插入失败
     if (sequenceList.count == sequenceList.size)
         return 0; //线性表已满，返回0表示插入失败
-    if (position < 1 || position > sequenceList.count)
+    if (index < 1 || index > sequenceList.count)
         return -1; //-1表示插入位置不合理
-    for (int i = sequenceList.count; i >= position; i--)
+    for (int i = sequenceList.count; i >= index; i--)
     {
         sequenceList.data[i] = sequenceList.data[i - 1];
     }
-    sequenceList.data[position - 1] = element;
+    sequenceList.data[index - 1] = element;
     sequenceList.count += 1;
     return 1; //插入成功，返回1
 }
@@ -308,7 +388,21 @@ int InsertElementByPosition(SequenceList &sequenceList, int position, ElementTyp
 - **C++编码实现**：
 
 ```C++
-
+//从顺序表中删除具有给定值x的所有元素。
+void RemoveAllValuesEqualGiveValue(SequenceList &sequenceList, ElementType element)
+{
+    int tmp = 0;
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] != element)
+        {
+            if (tmp != i)
+                sequenceList.data[tmp] = sequenceList.data[i];
+            tmp++;
+        }
+    }
+    sequenceList.count = tmp;
+}
 ```
 
 6. 设计一个算法，从顺序表中删除其值在给定值s与t（s $\leq$ t）之间的所有元素，如果顺序表为空，则显示错误信息并退出运行。
@@ -316,7 +410,30 @@ int InsertElementByPosition(SequenceList &sequenceList, int position, ElementTyp
 - **C++编码实现**：
 
 ```C++
-
+//从顺序表中删除其值在给定值s与t（s <= t）之间的所有元素，如果顺序表为空，则显示错误信息并退出运行。
+int RemoveAllValuesInGiveRange(SequenceList &sequenceList, ElementType lowerBound, ElementType upperBound)
+{
+    if (sequenceList.count == 0)
+        return 0;
+    if (lowerBound > upperBound)
+    {
+        ElementType tmpBound = upperBound;
+        upperBound = lowerBound;
+        lowerBound = tmpBound;
+    }
+    int tmp = 0;
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] < lowerBound || sequenceList.data[i] > upperBound)
+        {
+            if (tmp != i)
+                sequenceList.data[tmp] = sequenceList.data[i];
+            tmp++;
+        }
+    }
+    sequenceList.count = tmp;
+    return 1;
+}
 ```
 
 7. 设计一个算法，从有序顺序表中删除其值在给定值s与t（s $\leq$ t）之间的所有元素，如果顺序表为空，则显示错误信息并退出运行。
@@ -325,7 +442,30 @@ int InsertElementByPosition(SequenceList &sequenceList, int position, ElementTyp
 - **C++编码实现**：
 
 ```C++
-
+//设计一个算法，从有序顺序表中删除其值在给定值s与t（s <= t）之间的所有元素，如果顺序表为空，则显示错误信息并退出运行。
+int RemoveAllSequenceListValuesInGiveRange(SequenceList &sequenceList, ElementType lowerBound, ElementType upperBound)
+{
+    if (sequenceList.count == 0)
+        return 0;
+    if (lowerBound > upperBound)
+    {
+        ElementType tmpBound = upperBound;
+        upperBound = lowerBound;
+        lowerBound = tmpBound;
+    }
+    int tmp = 0;
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] <= lowerBound || sequenceList.data[i] >= upperBound)
+        {
+            if (tmp != i)
+                sequenceList.data[tmp] = sequenceList.data[i];
+            tmp++;
+        }
+    }
+    sequenceList.count = tmp;
+    return 1;
+}
 ```
 
 8. 设计一个算法，将两个有序顺序表合并成一个新的有序顺序表并由函数返回结果顺序表。
@@ -333,7 +473,44 @@ int InsertElementByPosition(SequenceList &sequenceList, int position, ElementTyp
 - **C++编码实现**：
 
 ```C++
-
+// 设计一个算法，将两个有序顺序表合并成一个新的有序顺序表并由函数返回结果顺序表。
+int MergeSequenceList(SequenceList sequenceListA, SequenceList sequenceListB, SequenceList &result)
+{
+    if (result.size < sequenceListA.count + sequenceListB.count)
+        return 0;
+    int count1 = 0;
+    int count2 = 0;
+    int count3 = 0;
+    while (count1 < sequenceListA.count && count2 < sequenceListB.count)
+    {
+        if (sequenceListA.data[count1] <= sequenceListB.data[count2])
+        {
+            result.data[count3] = sequenceListA.data[count1];
+            count3++;
+            count1++;
+        }
+        else
+        {
+            result.data[count3] = sequenceListB.data[count2];
+            count3++;
+            count2++;
+        }
+    }
+    while (count1 < sequenceListA.count)
+    {
+        result.data[count3] = sequenceListA.data[count1];
+        count3++;
+        count1++;
+    }
+    while (count2 < sequenceListB.count)
+    {
+        result.data[count3] = sequenceListB.data[count2];
+        count3++;
+        count2++;
+    }
+    result.count = count3;
+    return 1;
+}
 ```
 
 9. 设计一个算法，从有序顺序表中删除所有其值重复的元素，使表中所有元素的值均不相同。
@@ -341,7 +518,24 @@ int InsertElementByPosition(SequenceList &sequenceList, int position, ElementTyp
 - **C++编码实现**：
 
 ```C++
-
+//设计一个算法，从有序顺序表中删除所有其值重复的元素，使表中所有元素的值均不相同。
+int DeleteRepeatValuesFromSequenceList(SequenceList &sequenceList)
+{
+    if (sequenceList.count == 0)
+        return 0;
+    int tmp = 1;
+    for (int i = 1; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i - 1] != sequenceList.data[i])
+        {
+            if (tmp != i)
+                sequenceList.data[tmp] = sequenceList.data[i];
+            tmp++;
+        }
+    }
+    sequenceList.count = tmp;
+    return true;
+}
 ```
 
 10. 设计一个算法，以不多于 3n/2的平均比较次数，在一个有n个整数的顺序表A中找出具有最大值和最小值的整数。
@@ -349,6 +543,21 @@ int InsertElementByPosition(SequenceList &sequenceList, int position, ElementTyp
 - **C++编码实现**：
 
 ```C++
+//设计一个算法，以不多于 3n/2的平均比较次数，在一个有n个整数的顺序表A中找出具有最大值和最小值的整数。
+int FindMaximumValueAndMinimumValue(SequenceList sequenceList, ElementType &maxValue, ElementType &minValue)
+{
+    if (sequenceList.count == 0)
+        return 0;
+    maxValue = minValue = sequenceList.data[0];
+    for (int i = 0; i < sequenceList.count; i++)
+    {
+        if (sequenceList.data[i] > maxValue)
+            maxValue = sequenceList.data[i];
+        else if (sequenceList.data[i] < minValue)
+            minValue = sequenceList.data[i];
+    }
+    return 1;
+}
 
 ```
 
@@ -357,7 +566,29 @@ int InsertElementByPosition(SequenceList &sequenceList, int position, ElementTyp
 - **C++编码实现**：
 
 ```C++
-
+/* 设$A=(a_1,a_2,\cdots,a_{n-1},a_n)$和$B=(b_1,b_2,\cdots,b_{n-1},b_n)$均为顺序表，
+    $A^{'}$和$B^{'}$分别是除去最大公共前缀子串后的子表。如A=('b','e','i','j','i','n','g')，
+    B=('b','e','i','f','a','n','g')，则两者的最大公共前缀为'b','e','i'，在两个顺序表中除去
+    最大公共前缀的子表分别为A'=('j','i','n','g')，B'=('f','a','n','g')。若A'=B'=空表，则A=B；
+    若A'=空表且B'$\neq$空表，或两者均不空且A'的第一个元素值小于B'的第一个元素的值，则A$\lt$B，
+    否则A$\gt$B。设计一个算法根据上述方法比较A和B的大小。*/
+char CompareSequenceListWithSubList(SequenceList sequenceListA, SequenceList sequenceListB)
+{
+    int count = 0;
+    while (count < sequenceListA.count && count < sequenceListB.count)
+    {
+        if (sequenceListA.data[count] == sequenceListB.data[count])
+            count++;
+        else
+            break;
+    }
+    if (count >= sequenceListA.count && count >= sequenceListB.count)
+        return '=';
+    if (count >= sequenceListA.count || sequenceListA.data[count] < sequenceListB.data[count])
+        return '<';
+    else
+        return '>';
+}
 ```
 
 ### 线性表的链式存储——单链表
@@ -389,7 +620,330 @@ int InsertElementByPosition(SequenceList &sequenceList, int position, ElementTyp
 - **C++编码实现**：
 
 ```C++
+#include <iostream>
+using namespace std;
 
+// 公共变量
+const int INIT_SIZE = 100;
+typedef int ElementType;
+
+//单链表结点定义
+struct ListNode
+{
+    ElementType data;
+    ListNode *next;
+};
+
+//单链表定义
+struct LinkList
+{
+    ListNode *head;                                //头结点
+    ListNode *tail;                                //尾结点
+    int length;                                    //表长
+    void initLinkList();                           //初始化单链表
+    void insertFront(ElementType element);         //头部插入元素
+    void insertBack(ElementType element);          //尾部插入元素
+    bool deleteElement(int index);                 //删除指定位置元素结点
+    bool find(int index, ElementType &element);    //查找指定位置结点的元素值
+    int locate(ElementType element);               //查找给定元素第一次出现在单链表中的位置
+    bool replace(int indenx, ElementType element); //替换指定位置结点的元素值
+    void print();                                  //遍历单链表
+};
+
+//初始化单链表
+void LinkList::initLinkList()
+{
+    head = new ListNode;
+    head->next = nullptr;
+    tail == NULL;
+    length = 0;
+}
+
+//头部插入元素
+void LinkList::insertFront(ElementType element)
+{
+    ListNode *list_node = new ListNode;
+    list_node->data = element;
+    list_node->next = head->next;
+    head->next = list_node;
+    if (length == 0)
+        tail = list_node;
+    length += 1;
+}
+
+//尾部插入元素
+void LinkList::insertBack(ElementType element)
+{
+    ListNode *list_node = new ListNode;
+    list_node->data = element;
+    list_node->next = nullptr;
+    if (tail != NULL)
+    {
+        tail->next = list_node;
+        tail = list_node;
+    }
+    else
+    {
+        head->next = list_node;
+        tail = list_node;
+    }
+    length += 1;
+}
+
+//删除元素
+bool LinkList::deleteElement(int index)
+{
+    if (index < 1 || index > length)
+        return false;
+    ListNode *node = head;
+    int count = 0;
+    while (node != NULL && count < index - 1)
+    {
+        node = node->next;
+        count++;
+    }
+    if (node != NULL && count == index - 1)
+    {
+        ListNode *tmp = node->next;
+        node->next = tmp->next;
+        delete tmp;
+        length -= 1;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+//查找指定位置结点元素的值
+bool LinkList::find(int index, ElementType &element)
+{
+    if (index < 1 || index > length)
+        return false;
+    ListNode *node = head;
+    int count = 0;
+    while (node != NULL && count < index)
+    {
+        node = node->next;
+        count++;
+    }
+    if (node != NULL && count == index)
+    {
+        element = node->data;
+        return true;
+    }
+    else
+        return false;
+}
+
+//查找给定元素第一次出现在单链表中的位置 -1表示查找失败，
+//大于0的整数表示查找成功，且返回整数即为元素在单链表中第一次出现的位置。
+int LinkList::locate(ElementType element)
+{
+    int location = -1;
+    int count = 0;
+    ListNode *node = head;
+    while (node != NULL && node->next != nullptr)
+    {
+        node = node->next;
+        count++;
+        if (node->data == element)
+        {
+            location = count;
+            break;
+        }
+    }
+    return location;
+}
+
+//替换单链表指定位置结点元素的值
+bool LinkList::replace(int index, ElementType element)
+{
+    int count = 0;
+    ListNode *node = head;
+    while (node != NULL && count < index)
+    {
+        node = node->next;
+        count++;
+    }
+    if (node != NULL && count == index)
+    {
+        node->data = element;
+        return true;
+    }
+    else
+        return false;
+}
+
+//遍历单链表
+void LinkList::print()
+{
+    ListNode *ptr = head->next;
+    int count = 0;
+    while (ptr != NULL)
+    {
+        if (count != 0 && count < length)
+            cout << " ";
+        cout << ptr->data;
+        ptr = ptr->next;
+        count++;
+    }
+    cout << endl;
+}
+
+//单链表测试函数
+void testLinkList()
+{
+    LinkList list;
+    list.initLinkList();
+    cout << "单链表测试：" << endl;
+    cout << "采用前插法，向单链表插入分别以 1,2,3,4,5为值的五个结点，遍历单链表元素为：" << endl;
+    list.insertFront(1);
+    list.insertFront(2);
+    list.insertFront(3);
+    list.insertFront(4);
+    list.insertFront(5);
+    cout << "当前表长为：" << list.length << endl;
+    list.print();
+    cout << "采用尾插法，向单链表插入分别以 6,7,8,9,10为值的五个结点，遍历单链表元素为：" << endl;
+    list.insertBack(6);
+    list.insertBack(7);
+    list.insertBack(8);
+    list.insertBack(9);
+    list.insertBack(10);
+    cout << "当前表长为：" << list.length << endl;
+    list.print();
+    cout << "删除第1，3，5，7个结点元素，此时单链表元素为：" << endl;
+    bool flag = false;
+    flag = list.deleteElement(1);
+    if (flag)
+    {
+        cout << "第1个结点删除成功！当前单链表元素为：" << endl;
+    }
+    else
+    {
+        cout << "第1个结点删除失败！当前单链表元素为：" << endl;
+    }
+    list.print();
+    cout << "当前表长为：" << list.length << endl;
+    flag = list.deleteElement(3);
+    if (flag)
+    {
+        cout << "第3个结点删除成功！当前单链表元素为：" << endl;
+    }
+    else
+    {
+        cout << "第3个结点删除失败！当前单链表元素为：" << endl;
+    }
+    list.print();
+    cout << "当前表长为：" << list.length << endl;
+    flag = list.deleteElement(5);
+    if (flag)
+    {
+        cout << "第5个结点删除成功！当前单链表元素为：" << endl;
+    }
+    else
+    {
+        cout << "第5个结点删除失败！当前单链表元素为：" << endl;
+    }
+    list.print();
+    cout << "当前表长为：" << list.length << endl;
+    flag = list.deleteElement(7);
+    if (flag)
+    {
+        cout << "第7个结点删除成功！当前单链表元素为：" << endl;
+    }
+    else
+    {
+        cout << "第7个结点删除失败！当前单链表元素为：" << endl;
+    }
+    list.print();
+    cout << "当前表长为：" << list.length << endl;
+    ElementType e;
+    cout << "查找第1，4，8个结点元素的值：" << endl;
+    flag = list.find(1, e);
+    if (flag)
+    {
+        cout << "第1个结点元素的值为：" << e << endl;
+    }
+    else
+    {
+        cout << "未找到第1个结点！" << endl;
+    }
+    flag = list.find(4, e);
+    if (flag)
+    {
+        cout << "第4个结点元素的值为：" << e << endl;
+    }
+    else
+    {
+        cout << "未找到第4个结点！" << endl;
+    }
+    flag = list.find(8, e);
+    if (flag)
+    {
+        cout << "第8个结点元素的值为：" << e << endl;
+    }
+    else
+    {
+        cout << "未找到第8个结点！" << endl;
+    }
+    cout << "查找结点值为3，6，7在单链表中的位置" << endl;
+    int location = -1;
+    location = list.locate(3);
+    if (location <= 0)
+        cout << "结点值为3的结点未找到！" << endl;
+    else
+        cout << "结点值为3的元素的结点位置为：" << location << endl;
+    location = list.locate(6);
+    if (location <= 0)
+        cout << "结点值为6的结点未找到！" << endl;
+    else
+        cout << "结点值为6的元素的结点位置为：" << location << endl;
+    location = list.locate(7);
+    if (location <= 0)
+        cout << "结点值为7的结点未找到！" << endl;
+    else
+        cout << "结点值为7的元素的结点位置为：" << location << endl;
+    cout << "替换表中第1，3，5号位置结点的值为分别为2020,1,12" << endl;
+    flag = list.replace(1, 2020);
+    if (flag)
+    {
+        cout << "替换1号位置结点的值为2020成功！" << endl;
+    }
+    else
+    {
+        cout << "替换1号位置结点的值为2020失败！" << endl;
+    }
+    flag = list.replace(3, 1);
+    if (flag)
+    {
+        cout << "替换3号位置结点的值为1成功！" << endl;
+    }
+    else
+    {
+        cout << "替换3号位置结点的值为1失败！" << endl;
+    }
+    flag = list.replace(5, 12);
+    if (flag)
+    {
+        cout << "替换5号位置结点的值为12成功！" << endl;
+    }
+    else
+    {
+        cout << "替换5号位置结点的值为12失败！" << endl;
+    }
+    cout << "此时单链表各结点元素为：" << endl;
+    list.print();
+    cout << "单链表测试结束！" << endl;
+}
+
+//main函数
+int main(){
+    testLinkList();
+    return 0;
+}
 ```
 
 #### 疑难解答
