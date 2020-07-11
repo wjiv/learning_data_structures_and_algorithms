@@ -741,15 +741,93 @@ char CompareSequenceListWithSubList(SequenceList sequenceListA, SequenceList seq
         return '>';
 }
 
-//设计一个算法，在带头结点的单链表中寻找第i(i >= 1)。若找到，则返回第i个结点的地址；若找不到，则返回NULL。
+//设计一个算法，在带头结点的单链表中寻找第i(i >= 1)。若找到，则返回第i个结点的地址；若找不到，则返回NULL
+ListNode *FindNodeAddress(LinkList &linkList, int index)
+{
+    if (index < 0)
+        return NULL;
+    ListNode *node = linkList.head;
+    int count = 0;
+    while (node != NULL && count < index)
+    {
+        node = node->next;
+        count++;
+    }
+    return node;
+}
 
 //设计一个算法，在带头结点的单链表中确定值最大的结点。
+ListNode *FindListNodeWithMaximumValue(LinkList &linkList)
+{
+    if (linkList.head == NULL || linkList.head->next == nullptr)
+        return NULL;
+    ListNode *node = linkList.head;
+    ListNode *tmpNode = linkList.head->next;
+    while (tmpNode != NULL)
+    {
+        if (tmpNode->data > node->data)
+            node = tmpNode;
+        tmpNode = tmpNode->next;
+    }
+    return node;
+}
 
 //设计一个算法，统计带头结点的单链表中具有给定值x的所有元素数。
+int CountNodeNumbersWithGiveValue(LinkList linkList, ElementType element)
+{
+    int count = 0;
+    ListNode *ptr = linkList.head;
+    while (ptr != NULL)
+    {
+        if (ptr->data == element)
+            count += 1;
+        ptr = ptr->next;
+    }
+    return count;
+}
 
 //设计一个算法，根据一维数组A\[n]建立一个带头结点的单链表，使单链表中各个元素的次序与A\[n]中各元素的次序相同，要求该程序的时间复杂度为O(n)。
+void CreateLinkListByArray(LinkList &linkList, ElementType *array, int arrayLength)
+{
+    linkList.initLinkList();
+    ListNode *node = new ListNode;
+
+    for (int i = 0; i < arrayLength; i++)
+    {
+        node->data = array[i];
+        node->next = nullptr;
+        if (linkList.tail == NULL)
+        {
+            linkList.head->next = node;
+            linkList.tail = node;
+            linkList.length += 1;
+        }
+        else
+        {
+            linkList.tail->next = node;
+            linkList.tail = node;
+            linkList.length += 1;
+        }
+    }
+}
 
 //设计一个算法，在非递减有序的带头结点的单链表中删除值相同的多余结点。
+void DeleteRepeatValueNodeInIncreaseList(LinkList &linkList)
+{
+    ListNode *ptr = linkList.head;
+    ListNode *tmp = NULL;
+    while (ptr != NULL && ptr->next != nullptr)
+    {
+        if (ptr->data == ptr->next->data)
+        {
+            tmp = ptr->next;
+            ptr->next = tmp->next;
+            delete tmp;
+        }
+        else
+            ptr = ptr->next;
+    }
+}
 
 /*已知L为不带头结点的单链表的表头指针，链表中存储的都是整型数据，试写出下列运算的递归算法：
 
@@ -759,17 +837,133 @@ char CompareSequenceListWithSubList(SequenceList sequenceListA, SequenceList seq
 
     (3). 求链表所有元素的平均值。
 */
+// (1). 求链表中的最大整数；
+ElementType GetMaximumValueRecursively(ListNode *node)
+{
+    if (node->next == nullptr)
+        return node->data;
+    int tmpValue = GetMaximumValueRecursively(node->next);
+    return node->data > tmpValue ? node->data : tmpValue;
+}
+// (2). 求链表结点的个数;
+int CountNodeNumbersOfLinkList(ListNode *node)
+{
+    if (node->next == nullptr)
+        return 0;
+    return CountNodeNumbersOfLinkList(node->next) + 1;
+}
+// (3). 求链表所有元素的平均值。
+ElementType GetAveragAllOfLinkList(ListNode *node, int &count)
+{
+    if (node->next == NULL)
+    {
+        count = 1;
+        return (float)(node->data);
+    }
+    else
+    {
+        float sum = GetAveragAllOfLinkList(node->next, count) * count;
+        count++;
+        return (node->data + sum) / count;
+    }
+}
 
 //设ha和hb分别是两个带头结点的非递减有序单链表的表头指针，设计一个算法，将这个两个有序链表合并成一个非递增的单链表。要求结果链表仍使用原来两个链表的存储空间，不另外占用其他的存储空间。表中允许出现重复的数据。
+void MerageSequenceLinkList(LinkList &linkListA, LinkList &linkListB)
+{
+    ListNode *nodeA = linkListA.head->next;
+    ListNode *nodeB = linkListB.head->next;
+    ListNode *lastNode;
+    ListNode *ptr;
+    linkListA.head->next = nullptr; //合并后的链表保存在A链表中
+    delete linkListB.head;
+    while (nodeA != NULL && nodeB != NULL)
+    {
+        if (nodeA->data <= nodeB->data)
+        {
+            ptr = nodeA;
+            ptr = ptr->next;
+        }
+        else
+        {
+            ptr->next = nodeA->next;
+            nodeA->next = ptr;
+        }
+    }
+    if (nodeB != NULL)
+        nodeA = nodeB;
+    while (nodeA != NULL)
+    {
+        ptr = nodeA;
+        nodeA = nodeA->next;
+        ptr->next = nodeA->next;
+        nodeA->next = ptr;
+    }
+}
 
 //设有一个表头指针为h的单链表。设计一个算法，通过一次遍历，将链表中的所有结点的指针的链接方向逆转。
+void ReverseLinkList(LinkList &linkList)
+{
+    ListNode *ptr = linkList.head->next;
+    ListNode *tmpNode = NULL;
+    linkList.head->next = nullptr;
+    while (ptr != NULL)
+    {
+        tmpNode = ptr;
+        ptr = ptr->next;
+        ptr->next = linkList.head->next;
+        linkList.head->next = ptr;
+    }
+}
 
 //设在一个带头结点的单链表中所有元素结点的数据值按递增顺序排列，设计一个算法，删除所有大于min且小于max的元素结点（若存在）。
+void DeleteSequenceLinkListValueInGiveRange(LinkList &linkList, ElementType minValue, ElementType maxValue)
+{
+    ListNode *ptr = linkList.head;
+    ListNode *tmpNode = linkList.head->next;
+    while (ptr != NULL && ptr->data <= minValue)
+    {
+        ptr = tmpNode;
+        tmpNode = tmpNode->next;
+    }
+    while (tmpNode != NULL && tmpNode->data < maxValue)
+    {
+        ptr->next = tmpNode->next;
+        delete tmpNode;
+        tmpNode = ptr->next;
+    }
+}
+
+//设在一个带头结点的单链表中所有元素结点的数据值无序排列，设计一个算法，删除所有大于min且小于max的元素结点（若存在）。
+void DeleteLinkListValueInGiveRange(LinkList &linkList, ElementType minValue, ElementType maxValue)
+{
+    ListNode *ptr = linkList.head;
+    ListNode *tmpNode = linkList.head->next;
+    while (ptr != NULL)
+    {
+        if (tmpNode->data > minValue && tmpNode->data < maxValue)
+        {
+            ptr->next = tmpNode->next;
+            delete tmpNode;
+            tmpNode = ptr->next;
+        }
+        else
+        {
+            ptr = tmpNode;
+            tmpNode = tmpNode->next;
+        }
+    }
+}
 
 //根据一个结点数据为整型的单链表创建两个单链表，使得第一个单链表中包含原单链表中所有数值为奇数的结点，第二个单链表中包含原单链表中所有数据为偶数的结点，原有单链表保持不变。
+void SeparateLinkListAccordingToParity(LinkList &linkList, LinkList &linkList1, LinkList &linkList2)
+{
+}
 
 //已知一个带头结点的单链表中包含3类字符（数字字符，字母字符和其他字符），设计一个算法，构造3个新的单链表，使得每个单链表中只包含同一类字符。要求使用原来的空间，表头结点可以另辟空间。
-
+void SeparateCharacterInLinkList(LinkList &linkList)
+{
+}
 //设计一个算法,将一个带头结点的单循环链表中所有结点的链接方向逆转。
 
 //设有一个带头结点的非空双向循环链表L，指针p指向链表中第一个元素值为x的结点，设计一个算法，从链表中删除*p结点。
