@@ -981,7 +981,20 @@ int main(){
 - **C++语言编码实现**：
 
 ```C++
-
+//设计一个算法，在带头结点的单链表中寻找第i(i >= 1)。若找到，则返回第i个结点的地址；若找不到，则返回NULL
+ListNode *FindNodeAddress(LinkList &linkList, int index)
+{
+    if (index < 0)
+        return NULL;
+    ListNode *node = linkList.head;
+    int count = 0;
+    while (node != NULL && count < index)
+    {
+        node = node->next;
+        count++;
+    }
+    return node;
+}
 ```
 
 2. 设计一个算法，在带头结点的单链表中确定值最大的结点。
@@ -989,7 +1002,21 @@ int main(){
 - **C++语言编码实现**：
 
 ```C++
-
+//设计一个算法，在带头结点的单链表中确定值最大的结点。
+ListNode *FindListNodeWithMaximumValue(LinkList &linkList)
+{
+    if (linkList.head == NULL || linkList.head->next == nullptr)
+        return NULL;
+    ListNode *node = linkList.head;
+    ListNode *tmpNode = linkList.head->next;
+    while (tmpNode != NULL)
+    {
+        if (tmpNode->data > node->data)
+            node = tmpNode;
+        tmpNode = tmpNode->next;
+    }
+    return node;
+}
 ```
 
 3. 设计一个算法，统计带头结点的单链表中具有给定值x的所有元素数。
@@ -997,7 +1024,19 @@ int main(){
 - **C++语言编码实现**：
 
 ```C++
-
+//设计一个算法，统计带头结点的单链表中具有给定值x的所有元素数。
+int CountNodeNumbersWithGiveValue(LinkList linkList, ElementType element)
+{
+    int count = 0;
+    ListNode *ptr = linkList.head;
+    while (ptr != NULL)
+    {
+        if (ptr->data == element)
+            count += 1;
+        ptr = ptr->next;
+    }
+    return count;
+}
 ```
 
 4. 设计一个算法，根据一维数组A\[n]建立一个带头结点的单链表，使单链表中各个元素的次序与A\[n]中各元素的次序相同，要求该程序的时间复杂度为O(n)。
@@ -1005,7 +1044,30 @@ int main(){
 - **C++语言编码实现**：
 
 ```C++
+//设计一个算法，根据一维数组A\[n]建立一个带头结点的单链表，使单链表中各个元素的次序与A\[n]中各元素的次序相同，要求该程序的时间复杂度为O(n)。
+void CreateLinkListByArray(LinkList &linkList, ElementType *array, int arrayLength)
+{
+    linkList.initLinkList();
+    ListNode *node = new ListNode;
 
+    for (int i = 0; i < arrayLength; i++)
+    {
+        node->data = array[i];
+        node->next = nullptr;
+        if (linkList.tail == NULL)
+        {
+            linkList.head->next = node;
+            linkList.tail = node;
+            linkList.length += 1;
+        }
+        else
+        {
+            linkList.tail->next = node;
+            linkList.tail = node;
+            linkList.length += 1;
+        }
+    }
+}
 ```
 
 5. 设计一个算法，在非递减有序的带头结点的单链表中删除值相同的多余结点。
@@ -1013,7 +1075,23 @@ int main(){
 - **C++语言编码实现**：
 
 ```C++
-
+//设计一个算法，在非递减有序的带头结点的单链表中删除值相同的多余结点。
+void DeleteRepeatValueNodeInIncreaseList(LinkList &linkList)
+{
+    ListNode *ptr = linkList.head;
+    ListNode *tmp = NULL;
+    while (ptr != NULL && ptr->next != nullptr)
+    {
+        if (ptr->data == ptr->next->data)
+        {
+            tmp = ptr->next;
+            ptr->next = tmp->next;
+            delete tmp;
+        }
+        else
+            ptr = ptr->next;
+    }
+}
 ```
 
 6. 已知L为不带头结点的单链表的表头指针，链表中存储的都是整型数据，试写出下列运算的递归算法：
@@ -1027,7 +1105,44 @@ int main(){
 - **C++语言编码实现**：
 
 ```C++
+/*已知L为不带头结点的单链表的表头指针，链表中存储的都是整型数据，试写出下列运算的递归算法：
 
+    (1). 求链表中的最大整数；
+
+    (2). 求链表结点的个数;
+
+    (3). 求链表所有元素的平均值。
+*/
+// (1). 求链表中的最大整数；
+ElementType GetMaximumValueRecursively(ListNode *node)
+{
+    if (node->next == nullptr)
+        return node->data;
+    int tmpValue = GetMaximumValueRecursively(node->next);
+    return node->data > tmpValue ? node->data : tmpValue;
+}
+// (2). 求链表结点的个数;
+int CountNodeNumbersOfLinkList(ListNode *node)
+{
+    if (node->next == nullptr)
+        return 0;
+    return CountNodeNumbersOfLinkList(node->next) + 1;
+}
+// (3). 求链表所有元素的平均值。
+ElementType GetAveragAllOfLinkList(ListNode *node, int &count)
+{
+    if (node->next == NULL)
+    {
+        count = 1;
+        return (float)(node->data);
+    }
+    else
+    {
+        float sum = GetAveragAllOfLinkList(node->next, count) * count;
+        count++;
+        return (node->data + sum) / count;
+    }
+}
 ```
 
 7. 设ha和hb分别是两个带头结点的非递减有序单链表的表头指针，设计一个算法，将这个两个有序链表合并成一个非递增的单链表。要求结果链表仍使用原来两个链表的存储空间，不另外占用其他的存储空间。表中允许出现重复的数据。
@@ -1035,7 +1150,38 @@ int main(){
 - **C++语言编码实现**：
 
 ```C++
-
+//设ha和hb分别是两个带头结点的非递减有序单链表的表头指针，设计一个算法，将这个两个有序链表合并成一个非递增的单链表。要求结果链表仍使用原来两个链表的存储空间，不另外占用其他的存储空间。表中允许出现重复的数据。
+void MerageSequenceLinkList(LinkList &linkListA, LinkList &linkListB)
+{
+    ListNode *nodeA = linkListA.head->next;
+    ListNode *nodeB = linkListB.head->next;
+    ListNode *lastNode;
+    ListNode *ptr;
+    linkListA.head->next = nullptr; //合并后的链表保存在A链表中
+    delete linkListB.head;
+    while (nodeA != NULL && nodeB != NULL)
+    {
+        if (nodeA->data <= nodeB->data)
+        {
+            ptr = nodeA;
+            ptr = ptr->next;
+        }
+        else
+        {
+            ptr->next = nodeA->next;
+            nodeA->next = ptr;
+        }
+    }
+    if (nodeB != NULL)
+        nodeA = nodeB;
+    while (nodeA != NULL)
+    {
+        ptr = nodeA;
+        nodeA = nodeA->next;
+        ptr->next = nodeA->next;
+        nodeA->next = ptr;
+    }
+}
 ```
 
 8. 设有一个表头指针为h的单链表。设计一个算法，通过一次遍历，将链表中的所有结点的指针的链接方向逆转。
@@ -1043,7 +1189,20 @@ int main(){
 - **C++语言编码实现**：
 
 ```C++
-
+//设有一个表头指针为h的单链表。设计一个算法，通过一次遍历，将链表中的所有结点的指针的链接方向逆转。
+void ReverseLinkList(LinkList &linkList)
+{
+    ListNode *ptr = linkList.head->next;
+    ListNode *tmpNode = NULL;
+    linkList.head->next = nullptr;
+    while (ptr != NULL)
+    {
+        tmpNode = ptr;
+        ptr = ptr->next;
+        ptr->next = linkList.head->next;
+        linkList.head->next = ptr;
+    }
+}
 ```
 
 9. 设在一个带头结点的单链表中所有元素结点的数据值按递增顺序排列，设计一个算法，删除所有大于min且小于max的元素结点（若存在）。
@@ -1051,23 +1210,158 @@ int main(){
 - **C++语言编码实现**：
 
 ```C++
-
+//设在一个带头结点的单链表中所有元素结点的数据值按递增顺序排列，设计一个算法，删除所有大于min且小于max的元素结点（若存在）。
+void DeleteSequenceLinkListValueInGiveRange(LinkList &linkList, ElementType minValue, ElementType maxValue)
+{
+    ListNode *ptr = linkList.head;
+    ListNode *tmpNode = linkList.head->next;
+    while (ptr != NULL && ptr->data <= minValue)
+    {
+        ptr = tmpNode;
+        tmpNode = tmpNode->next;
+    }
+    while (tmpNode != NULL && tmpNode->data < maxValue)
+    {
+        ptr->next = tmpNode->next;
+        delete tmpNode;
+        tmpNode = ptr->next;
+    }
+}
 ```
 
-10. 根据一个结点数据为整型的单链表创建两个单链表，使得第一个单链表中包含原单链表中所有数值为奇数的结点，第二个单链表中包含原单链表中所有数据为偶数的结点，原有单链表保持不变。
+10. 设在一个带头结点的单链表中所有元素结点的数据值按无序排列，设计一个算法，删除所有大于min且小于max的元素结点（若存在）。
 
 - **C++语言编码实现**：
 
 ```C++
-
+//设在一个带头结点的单链表中所有元素结点的数据值无序排列，设计一个算法，删除所有大于min且小于max的元素结点（若存在）。
+void DeleteLinkListValueInGiveRange(LinkList &linkList, ElementType minValue, ElementType maxValue)
+{
+    ListNode *ptr = linkList.head;
+    ListNode *tmpNode = linkList.head->next;
+    while (ptr != NULL)
+    {
+        if (tmpNode->data > minValue && tmpNode->data < maxValue)
+        {
+            ptr->next = tmpNode->next;
+            delete tmpNode;
+            tmpNode = ptr->next;
+        }
+        else
+        {
+            ptr = tmpNode;
+            tmpNode = tmpNode->next;
+        }
+    }
+}
 ```
 
-11. 已知一个带头结点的单链表中包含3类字符（数字字符，字母字符和其他字符），设计一个算法，构造3个新的单链表，使得每个单链表中只包含同一类字符。要求使用原来的空间，表头结点可以另辟空间。
+11. 根据一个结点数据为整型的单链表创建两个单链表，使得第一个单链表中包含原单链表中所有数值为奇数的结点，第二个单链表中包含原单链表中所有数据为偶数的结点，原有单链表保持不变。
 
 - **C++语言编码实现**：
 
 ```C++
+//根据一个结点数据为整型的单链表创建两个单链表，使得第一个单链表中包含原单链表中所有数值为奇数的结点，第二个单链表中包含原单链表中所有数据为偶数的结点，原有单链表保持不变。
+void SeparateLinkListAccordingToParity(LinkList &linkList, LinkList &linkList1, LinkList &linkList2)
+{
+    ListNode *node1 = new ListNode;
+    ListNode *node2 = new ListNode;
+    linkList1.initLinkList();
+    linkList2.initLinkList();
+    ListNode *ptr = linkList.head->next;
+    ListNode *tmpNode = NULL;
+    while (ptr != NULL)
+    {
+        tmpNode = new ListNode;
+        tmpNode->data = ptr->data;
+        tmpNode->next = nullptr;
+        if (ptr->data % 2 == 1)
+        {
+            if (linkList1.tail == NULL)
+            {
+                linkList1.head->next = tmpNode;
+                linkList1.tail = tmpNode;
+            }
+            else
+            {
 
+                linkList1.tail->next = tmpNode;
+                linkList1.tail = tmpNode;
+            }
+            linkList1.length += 1;
+        }
+        else
+        {
+            if (linkList2.tail == NULL)
+            {
+                linkList2.head->next = tmpNode;
+                linkList2.tail = tmpNode;
+            }
+            else
+            {
+
+                linkList2.tail->next = tmpNode;
+                linkList2.tail = tmpNode;
+            }
+            linkList2.length += 1;
+        }
+    }
+}
+```
+
+12. 已知一个带头结点的单链表中包含3类字符（数字字符，字母字符和其他字符），设计一个算法，构造3个新的单链表，使得每个单链表中只包含同一类字符。要求使用原来的空间，表头结点可以另辟空间。
+
+- **C++语言编码实现**：
+
+```C++
+//已知一个带头结点的单链表中包含3类字符（数字字符，字母字符和其他字符），设计一个算法，构造3个新的单链表，使得每个单链表中只包含同一类字符。要求使用原来的空间，表头结点可以另辟空间。
+void SeparateCharacterInLinkList(LinkList &linkListA, LinkList &linkListB, LinkList &linkListC)
+{
+    ListNode *ptrA = linkListA.head;
+    ListNode *ptrB;
+    ListNode *ptrC = linkListC.head;
+    ListNode *ptr = linkListA.head->next;
+    linkListB.initLinkList();
+    linkListC.initLinkList();
+    ptrB = linkListB.head;
+    ptrC = linkListB.head;
+    while (ptr != NULL)
+    {
+        if (isdigit(ptr->data))
+        {
+            ptr->next = nullptr;
+            if (linkListB.tail == NULL)
+            {
+                linkListB.head->next = ptr;
+                linkListB.tail = ptr;
+            }
+            else
+            {
+
+                linkListB.tail->next = ptr;
+                linkListB.tail = ptr;
+            }
+            linkListB.length += 1;
+        }
+        else if (isalpha(ptr->data))
+        {
+            ptr->next = nullptr;
+            if (linkListC.tail == NULL)
+            {
+                linkListC.head->next = ptr;
+                linkListC.tail = ptr;
+            }
+            else
+            {
+
+                linkListC.tail->next = ptr;
+                linkListB.tail = ptr;
+            }
+            linkListC.length += 1;
+        }
+        ptr = ptr->next;
+    }
+}
 ```
 
 ### 理解线性表存储结构的要点
@@ -1214,7 +1508,21 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 - **C++语言编码实现**：
 
 ```C++
-
+//设计一个算法,将一个带头结点的单循环链表中所有结点的链接方向逆转
+void ReverseCircleLinkList(SingleLoopLinkList &singleLoopLinkList)
+{
+    SingleLoopLinkListNode *ptr;
+    SingleLoopLinkListNode *tmpNode;
+    ptr = singleLoopLinkList.head->link;
+    singleLoopLinkList.head->link = singleLoopLinkList.head;
+    while (ptr != NULL)
+    {
+        tmpNode = ptr->link;
+        ptr->link = singleLoopLinkList.head->link;
+        singleLoopLinkList.head->link = ptr;
+        ptr = tmpNode;
+    }
+}
 ```
 
 2. 设有一个带头结点的非空双向循环链表L，指针p指向链表中第一个元素值为x的结点，设计一个算法，从链表中删除*p结点。
@@ -1222,7 +1530,21 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 - **C++语言编码实现**：
 
 ```C++
-
+//设有一个带头结点的非空双向循环链表L，指针p指向链表中第一个元素值为x的结点，设计一个算法，从链表中删除*p结点。
+int DeleteNodeFromDoubleLoopLinkList(DoubleLoopLinkList &doubleLoopLinkList, ElementType element)
+{
+    DoubleLoopLinkListNode *ptr = doubleLoopLinkList.head->rightLink;
+    while (ptr != NULL && ptr->data != element)
+    {
+        ptr = ptr->rightLink;
+    }
+    if (ptr == doubleLoopLinkList.head)
+        return 0;
+    ptr->leftLink->rightLink = ptr->rightLink;
+    ptr->rightLink->leftLink = ptr->leftLink;
+    delete ptr;
+    return 1;
+}
 ```
 
 3. 设计一个算法，逆转带头结点的双向循环链表中所有结点的链接方向。
@@ -1230,7 +1552,19 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 - **C++语言编码实现**：
 
 ```C++
-
+//设计一个算法，逆转带头结点的双向循环链表中所有结点的链接方向。
+void ReverseDoubleLoopLinkList(DoubleLoopLinkList doubleLoopLinkList)
+{
+    DoubleLoopLinkListNode *ptr = doubleLoopLinkList.head;
+    DoubleLoopLinkListNode *tmpPtr;
+    do
+    {
+        tmpPtr = ptr->rightLink;
+        ptr->rightLink = ptr->leftLink;
+        ptr->leftLink = tmpPtr;
+        ptr = tmpPtr;
+    } while (ptr != doubleLoopLinkList.head);
+}
 ```
 
 4. 设计一个算法，改造一个带头结点的双向链表，所有结点的原有次序保持在各结点的rLink域中，而lLink域把所有结点按照其值从小到大的顺序链接起来。
@@ -1238,7 +1572,29 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 - **C++语言编码实现**：
 
 ```C++
+//设计一个算法，改造一个带头结点的双向链表，所有结点的原有次序保持在各结点的rLink域中，而lLink域把所有结点按照其值从小到大的顺序链接起来。
+void ModifySpecialDoubleLinkList(DoubleLinkList &doubleLinkList)
+{
+    DoubleLinkListNode *ptr = NULL;
+    DoubleLinkListNode *tmpPtr1 = NULL;
+    DoubleLinkListNode *tmpPtr2 = doubleLinkList.head->rightLink->rightLink;
+    doubleLinkList.head->leftLink = doubleLinkList.head->rightLink;
+    doubleLinkList.head->leftLink->leftLink = NULL;
+    while (tmpPtr2 != NULL)
+    {
+        tmpPtr1 = doubleLinkList.head->leftLink;
+        ptr = doubleLinkList.head;
+        while (tmpPtr1 != NULL && ptr->data < tmpPtr2->data)
+        {
+            ptr = tmpPtr1;
+            tmpPtr1 = tmpPtr1->leftLink;
+        }
 
+        ptr->leftLink = tmpPtr2;
+        tmpPtr2->leftLink = tmpPtr1;
+        tmpPtr2 = tmpPtr2->rightLink;
+    }
+}
 ```
 
 5. 设以带头结点的双向循环链表表示线性表L=（$a_1,a_2,\cdots ,a_{n-1},a_n$）。设计一个时间复杂度为O(n)的算法，将L改造为L=（$a_1,a_3,\cdots ,a_n, \cdots ,a_4,a_2$）。
@@ -1246,7 +1602,29 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 - **C++语言编码实现**：
 
 ```C++
-
+//设以带头结点的双向循环链表表示线性表L=（$a_1,a_2,\cdots ,a_{n-1},a_n$）。设计一个时间复杂度为O(n)的算法，将L改造为L=（$a_1,a_3,\cdots ,a_n, \cdots ,a_4,a_2$）。
+void ModifySpecialDoubleLoopLinkList(DoubleLoopLinkList &doubleLoopLinkList)
+{
+    DoubleLoopLinkListNode *ptr = doubleLoopLinkList.head->rightLink;
+    DoubleLoopLinkListNode *tmpPtr1 = ptr->rightLink;
+    DoubleLoopLinkListNode *tmpPtr2 = tmpPtr1->rightLink;
+    while (tmpPtr2 != NULL && tmpPtr1 != doubleLoopLinkList.head)
+    {
+        ptr->rightLink = tmpPtr2;
+        tmpPtr2->leftLink = ptr;
+        tmpPtr1->rightLink = ptr->leftLink;
+        ptr->leftLink = tmpPtr1;
+        ptr = tmpPtr2;
+        tmpPtr1 = ptr->rightLink;
+        tmpPtr2 = tmpPtr1->rightLink;
+    }
+    if (tmpPtr1 == doubleLoopLinkList.head)
+    {
+        tmpPtr2 = ptr->leftLink;
+        ptr->rightLink = tmpPtr2;
+        tmpPtr2->leftLink = ptr;
+    }
+}
 ```
 
 6. 设计一个实现下属要求的Locate运算函数。设有一个带头结点双向链表L，每个结点有4个数据成员：指向前驱结点的指针lLink，指向后继节点的指针rLink，存放数据的成员data和访问频度frequency。所有结点的frequency初始时都为0。每当在链表上进行一次Locate(x)操作时，令元素值x结点的访问频度frequency加1，并将该结点前移，链接到与它的访问频度相等的结点后面，使得链表中所有结点保持按访问品读递减的顺序排列，以使频繁访问的结点总是靠近表头。
@@ -1254,7 +1632,53 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 - **C++语言编码实现**：
 
 ```C++
+/*设计一个实现下属要求的Locate运算函数。设有一个带头结点双向链表L，每个结点有4个数据成员：
+    指向前驱结点的指针lLink，指向后继节点的指针rLink，存放数据的成员data和访问频度frequency。
+    所有结点的frequency初始时都为0。每当在链表上进行一次Locate(x)操作时，令元素值x结点的访问
+    频度frequency加1，并将该结点前移，链接到与它的访问频度相等的结点后面，使得链表中所有结点
+    保持按访问品读递减的顺序排列，以使频繁访问的结点总是靠近表头。*/
+struct SpecialDoubleLoopLinkListNode
+{
+    ElementType data;
+    int frequency;
+    SpecialDoubleLoopLinkListNode *rightLink;
+    SpecialDoubleLoopLinkListNode *leftLink;
+};
 
+struct SpecialDoubleLoopLinkList
+{
+    SpecialDoubleLoopLinkListNode *head;
+    void initSpecialDoubleLoopLinkList();
+};
+
+SpecialDoubleLoopLinkListNode *Locate(SpecialDoubleLoopLinkList &doubleLoopLinkList, ElementType element)
+{
+    SpecialDoubleLoopLinkListNode *ptr = doubleLoopLinkList.head->rightLink;
+    SpecialDoubleLoopLinkListNode *tmpNode = NULL;
+    while (ptr != NULL && ptr->data != element)
+    {
+        ptr = ptr->rightLink;
+    }
+    if (ptr != NULL)
+    {
+        tmpNode->frequency++;
+        tmpNode = ptr;
+        tmpNode->leftLink->rightLink = tmpNode->rightLink;
+        tmpNode->rightLink->leftLink = tmpNode->leftLink;
+        ptr = tmpNode->leftLink;
+        while (ptr != NULL && tmpNode->frequency > ptr->frequency)
+        {
+            ptr = ptr->leftLink;
+        }
+        tmpNode->rightLink = ptr->rightLink;
+        tmpNode->leftLink = ptr;
+        ptr->rightLink->leftLink = tmpNode;
+        ptr->rightLink = tmpNode;
+        return tmpNode;
+    }
+    else
+        return NULL;
+}
 ```
 
 ### 线性表的应用
@@ -1298,10 +1722,101 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 - **C++语言编码实现**：
 
 ```C++
+/*Josephus问题：设n个人围坐在圆桌周围，现在从第s个人开始报数，报到第m个人让他出局；然后从出局者的下一个人开始从新报数，数到第m个人，再让他出局....如此反复，直到所有的人全部出局为止。对于任意给定的n,s,m,求出这n个人的出局序列。以n=9,s=1,m=5为例验证。
 
+    （1）. 若用整数序列1，2，3，...，n表示顺序围坐在圆桌周围的人，设计一个算法用一维数组表示作为求解过程中使用的数据结构，解决上述问题。
+
+    （2）. 采用带头结点的单循环链表作为求解过程中使用的数据结构，设计一个算法，解决上述问题。
+
+    （3）. 采用带头结点的双向循环链表作为求解过程中使用的数据结构，设计一个算法，解决上述问题。*/
+
+//采用数组作为数据结构
+void Josephus(int *arr, int s, int m, int n)
+{
+    int i, j, k = n;
+    for (i = 0; i < n; i++)
+    {
+        i = (s - 1 + n) % n;
+    }
+    while (k > 0)
+    {
+        for (j = 1; j < m; j++)
+        {
+            i = (i + 1) % k;
+        }
+        cout << arr[i] << " ";
+        for (j = i + 1; j < k; j++)
+        {
+            arr[j - 1] = arr[j];
+        }
+        k--;
+    }
+    cout << endl;
+}
+//采用单循环链表作为数据结构
+void Josephus(SingleLoopLinkList &singleLoopLinkList, int s, int m, int n)
+{
+    SingleLoopLinkListNode *ptr = singleLoopLinkList.head->link;
+    SingleLoopLinkListNode *tmpPtr = singleLoopLinkList.head;
+    int i, j;
+    for (i = 1; i < s; i++)
+    {
+        ptr = ptr->link;
+    }
+
+    for (i = 0; i < n; i++)
+    {
+        for (j = 1; j < m; j++)
+        {
+            tmpPtr = ptr;
+            ptr = ptr->link;
+            if (ptr == singleLoopLinkList.head)
+            {
+                tmpPtr = ptr;
+                ptr = ptr->link;
+            }
+        }
+        cout << ptr->data << " ";
+        tmpPtr->link = ptr->link;
+        delete ptr;
+        ptr = tmpPtr->link;
+    }
+    cout << endl;
+}
+//采用双循环链表作为数据结构
+void Josephus(DoubleLoopLinkList &doubleLoopLinkList, int s, int m, int n)
+{
+    DoubleLoopLinkListNode *ptr = doubleLoopLinkList.head->rightLink;
+    DoubleLoopLinkListNode *tmpPtr = NULL;
+    int i, j;
+    for (i = 1; i < s; i++)
+    {
+        ptr = ptr->rightLink;
+    }
+
+    for (i = 0; i < n; i++)
+    {
+        for (j = 1; j < m; j++)
+        {
+            if (ptr->rightLink != doubleLoopLinkList.head)
+            {
+                ptr = ptr->rightLink;
+            }
+            else
+                ptr = doubleLoopLinkList.head->rightLink;
+        }
+        cout << ptr->data << " ";
+        ptr->leftLink->rightLink = ptr->rightLink;
+        ptr->rightLink->leftLink = ptr->leftLink;
+        tmpPtr = ptr->rightLink;
+        delete ptr;
+        ptr = tmpPtr;
+    }
+    cout << endl;
+}
 ```
 
-2. 设计一个算法，求两个用（01）向量表示的集合A和集合B的并，通过第3个用（01）向量表示的集合C返回运算结果，A和B的原有内容保持不变。
+2. 设计一个算法，求两个用有序链表表示的集合A和集合B的并，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
 
 - **C++语言编码实现**：
 
@@ -1309,7 +1824,7 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 
 ```
 
-3. 设计一个算法，求两个用（01）向量表示的集合A和集合B的交，通过第3个用（01）向量表示的集合C返回运算结果，A和B的原有内容保持不变。
+3. 设计一个算法，求两个用有序链表表示的集合A和集合B的交，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
 
 - **C++语言编码实现**：
 
@@ -1317,7 +1832,7 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 
 ```
 
-4. 设计一个算法，求两个用（01）向量表示的集合A和集合B的差，通过第3个用（01）向量表示的集合C返回运算结果，A和B的原有内容保持不变。
+4. 设计一个算法，求两个用有序链表表示的集合A和集合B的差，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
 
 - **C++语言编码实现**：
 
@@ -1325,7 +1840,7 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 
 ```
 
-5. 设计一个算法，求两个用有序链表表示的集合A和集合B的并，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
+5. 若采用数组来存储一元多项式的系数，即用数组的第i个元素存放多项式的第i次幂项的系数，如对于一元多项式 $f(x) = 6x^6 + 7x^4 - 10x^2 + 5x +3$。设计两个算法，分别求一元多项式的和跟乘积。
 
 - **C++语言编码实现**：
 
@@ -1333,7 +1848,7 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 
 ```
 
-6. 设计一个算法，求两个用有序链表表示的集合A和集合B的交，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
+6. 设计一个算法，输入一元多项式的系数跟指数，按照指数降幂的方式建立多项式链表。如果输入的指数与链表中已有的某一项的指数相等，则新的项不加入，并报告作废信息。整个输入序列以输入系数为0标志结束。
 
 - **C++语言编码实现**：
 
@@ -1341,31 +1856,7 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 
 ```
 
-7. 设计一个算法，求两个用有序链表表示的集合A和集合B的差，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
-
-- **C++语言编码实现**：
-
-```C++
-
-```
-
-8. 若采用数组来存储一元多项式的系数，即用数组的第i个元素存放多项式的第i次幂项的系数，如对于一元多项式 $f(x) = 6x^6 + 7x^4 - 10x^2 + 5x +3$。设计两个算法，分别求一元多项式的和跟乘积。
-
-- **C++语言编码实现**：
-
-```C++
-
-```
-
-9. 设计一个算法，输入一元多项式的系数跟指数，按照指数降幂的方式建立多项式链表。如果输入的指数与链表中已有的某一项的指数相等，则新的项不加入，并报告作废信息。整个输入序列以输入系数为0标志结束。
-
-- **C++语言编码实现**：
-
-```C++
-
-```
-
-10. 设对于一个一元多项式 $P(x) = a_{m-1}x^{e_{m-1}} + a_{m-2}x^{e_{m-2}} + \cdots + a_{0}x^{e_{0}}$ ，用表长为m的带有头结点的单链表表示为 $(t_{m-1} , t_{m-2} , \cdots , t_1, t_0)$ 。其中，m是多项式 $P(x)$ 中非0项的个数，每一个 $t_i(0 \leq t_i \leq m-1)$ 是 $P(x)$ 的一个非0项，各个项按指数 $e_i$ 递减顺序排列： $e_{m-1} \gt e_{m-2} \gt \cdots \gt e_0 \gt 0$ 。
+7. 设对于一个一元多项式 $P(x) = a_{m-1}x^{e_{m-1}} + a_{m-2}x^{e_{m-2}} + \cdots + a_{0}x^{e_{0}}$ ，用表长为m的带有头结点的单链表表示为 $(t_{m-1} , t_{m-2} , \cdots , t_1, t_0)$ 。其中，m是多项式 $P(x)$ 中非0项的个数，每一个 $t_i(0 \leq t_i \leq m-1)$ 是 $P(x)$ 的一个非0项，各个项按指数 $e_i$ 递减顺序排列： $e_{m-1} \gt e_{m-2} \gt \cdots \gt e_0 \gt 0$ 。
     
     （1）. 设计一个一元多项式插入新项的算法Insert。该算法的功能是：如果多项式中没有与新项指数相等的项，则将此项插入到多项式链表的适当位置；如果多项式中已有与新项指数相同的项，则将它们合并。
 
@@ -1377,7 +1868,7 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 
 ```
 
-11. 设计一个算法，按照降幂的次序输出一个一元多项式。
+8. 设计一个算法，按照降幂的次序输出一个一元多项式。
 
 - **C++语言编码实现**：
 
@@ -1385,7 +1876,7 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 
 ```
 
-12. 用带头结点的单链表表示一个一元多项式，链表中的结点按幂指数降序链接。设计一个算法，将表示一元多项式的单链表就地逆置，改为按幂指数升序链接。
+9. 用带头结点的单链表表示一个一元多项式，链表中的结点按幂指数降序链接。设计一个算法，将表示一元多项式的单链表就地逆置，改为按幂指数升序链接。
 
 - **C++语言编码实现**：
 
@@ -1393,7 +1884,7 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 
 ```
 
-13. 用带头结点的单链表表示一个一元多项式，试设计一个算法，计算多项式A在x处的值。
+10. 用带头结点的单链表表示一个一元多项式，试设计一个算法，计算多项式A在x处的值。
 
 - **C++语言编码实现**：
 
@@ -1401,7 +1892,7 @@ typedef StaticListLinkNode StaticLinkList[DefaultSize];
 
 ```
 
-14. 类似用数组表示一元多项式，可用二维数组A表示二元多项式，数组元素A\[i]\[j]表示多项式中 $x^i$ 和 $y^j$ 的系数。试设计一个算法，把用二维数组表示的二元多项式以常规多项式的形式按升幂顺序输出。对于多项式的每一项 $c_kx^iy^j$ 可以打印成 $c_k$x^iy^j ，其中 $c_k$ ，i 和 j用实际值输出。当 $c_k$ ， i ， j 的值为1时，可以不显示 $c_k$ ，i ， j ，^ 。
+11. 类似用数组表示一元多项式，可用二维数组A表示二元多项式，数组元素A\[i]\[j]表示多项式中 $x^i$ 和 $y^j$ 的系数。试设计一个算法，把用二维数组表示的二元多项式以常规多项式的形式按升幂顺序输出。对于多项式的每一项 $c_kx^iy^j$ 可以打印成 $c_k$x^iy^j ，其中 $c_k$ ，i 和 j用实际值输出。当 $c_k$ ， i ， j 的值为1时，可以不显示 $c_k$ ，i ， j ，^ 。
 
 - **C++语言编码实现**：
 

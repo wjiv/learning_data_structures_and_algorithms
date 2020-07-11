@@ -3,6 +3,7 @@
 // 头文件及名称空间
 
 #include <iostream>
+#include <cctype>
 
 using namespace std;
 
@@ -511,6 +512,72 @@ void testLinkList()
 
 #pragma endregion 单链表部分结束
 
+#pragma region 单循环链表开始
+
+//单循环链表结点结构
+struct SingleLoopLinkListNode
+{
+    ElementType data;
+    SingleLoopLinkListNode *link;
+};
+
+//单循环链表结构
+struct SingleLoopLinkList
+{
+    SingleLoopLinkListNode *head;
+    void initSingleLoopLinkList();
+};
+
+#pragma endregion 单循环链表结束
+
+#pragma region 双向链表开始
+
+//双向链表结点结构
+struct DoubleLinkListNode
+{
+    ElementType data;
+    DoubleLinkListNode *leftLink;
+    DoubleLinkListNode *rightLink;
+};
+
+//双向链表结构
+struct DoubleLinkList
+{
+    DoubleLinkListNode *head;
+    void initDoubleLinkList();
+};
+
+#pragma endregion 双向链表结束
+
+#pragma region 双向循环链表开始
+//双向循环链表结点结构
+struct DoubleLoopLinkListNode
+{
+    ElementType data;
+    DoubleLoopLinkListNode *leftLink;
+    DoubleLoopLinkListNode *rightLink;
+};
+
+//双向循环链表结构
+struct DoubleLoopLinkList
+{
+    DoubleLoopLinkListNode *head;
+    void initDoubleLoopLinkList();
+};
+
+#pragma endregion 双向循环链表结束
+
+#pragma region 静态链表开始
+
+//静态链表结点结构
+struct StaticLinkList
+{
+    ElementType data;
+    StaticLinkList *link;
+};
+
+#pragma endregion 静态链表结束
+
 #pragma region 线性表相关算法部分开始
 
 //原地逆置线性表
@@ -958,29 +1025,242 @@ void DeleteLinkListValueInGiveRange(LinkList &linkList, ElementType minValue, El
 //根据一个结点数据为整型的单链表创建两个单链表，使得第一个单链表中包含原单链表中所有数值为奇数的结点，第二个单链表中包含原单链表中所有数据为偶数的结点，原有单链表保持不变。
 void SeparateLinkListAccordingToParity(LinkList &linkList, LinkList &linkList1, LinkList &linkList2)
 {
+    ListNode *node1 = new ListNode;
+    ListNode *node2 = new ListNode;
+    linkList1.initLinkList();
+    linkList2.initLinkList();
+    ListNode *ptr = linkList.head->next;
+    ListNode *tmpNode = NULL;
+    while (ptr != NULL)
+    {
+        tmpNode = new ListNode;
+        tmpNode->data = ptr->data;
+        tmpNode->next = nullptr;
+        if (ptr->data % 2 == 1)
+        {
+            if (linkList1.tail == NULL)
+            {
+                linkList1.head->next = tmpNode;
+                linkList1.tail = tmpNode;
+            }
+            else
+            {
+
+                linkList1.tail->next = tmpNode;
+                linkList1.tail = tmpNode;
+            }
+            linkList1.length += 1;
+        }
+        else
+        {
+            if (linkList2.tail == NULL)
+            {
+                linkList2.head->next = tmpNode;
+                linkList2.tail = tmpNode;
+            }
+            else
+            {
+
+                linkList2.tail->next = tmpNode;
+                linkList2.tail = tmpNode;
+            }
+            linkList2.length += 1;
+        }
+    }
 }
 
 //已知一个带头结点的单链表中包含3类字符（数字字符，字母字符和其他字符），设计一个算法，构造3个新的单链表，使得每个单链表中只包含同一类字符。要求使用原来的空间，表头结点可以另辟空间。
-void SeparateCharacterInLinkList(LinkList &linkList)
+void SeparateCharacterInLinkList(LinkList &linkListA, LinkList &linkListB, LinkList &linkListC)
 {
+    ListNode *ptrA = linkListA.head;
+    ListNode *ptrB;
+    ListNode *ptrC = linkListC.head;
+    ListNode *ptr = linkListA.head->next;
+    linkListB.initLinkList();
+    linkListC.initLinkList();
+    ptrB = linkListB.head;
+    ptrC = linkListB.head;
+    while (ptr != NULL)
+    {
+        if (isdigit(ptr->data))
+        {
+            ptr->next = nullptr;
+            if (linkListB.tail == NULL)
+            {
+                linkListB.head->next = ptr;
+                linkListB.tail = ptr;
+            }
+            else
+            {
+
+                linkListB.tail->next = ptr;
+                linkListB.tail = ptr;
+            }
+            linkListB.length += 1;
+        }
+        else if (isalpha(ptr->data))
+        {
+            ptr->next = nullptr;
+            if (linkListC.tail == NULL)
+            {
+                linkListC.head->next = ptr;
+                linkListC.tail = ptr;
+            }
+            else
+            {
+
+                linkListC.tail->next = ptr;
+                linkListB.tail = ptr;
+            }
+            linkListC.length += 1;
+        }
+        ptr = ptr->next;
+    }
 }
-//设计一个算法,将一个带头结点的单循环链表中所有结点的链接方向逆转。
+
+//设计一个算法,将一个带头结点的单循环链表中所有结点的链接方向逆转
+void ReverseCircleLinkList(SingleLoopLinkList &singleLoopLinkList)
+{
+    SingleLoopLinkListNode *ptr;
+    SingleLoopLinkListNode *tmpNode;
+    ptr = singleLoopLinkList.head->link;
+    singleLoopLinkList.head->link = singleLoopLinkList.head;
+    while (ptr != NULL)
+    {
+        tmpNode = ptr->link;
+        ptr->link = singleLoopLinkList.head->link;
+        singleLoopLinkList.head->link = ptr;
+        ptr = tmpNode;
+    }
+}
 
 //设有一个带头结点的非空双向循环链表L，指针p指向链表中第一个元素值为x的结点，设计一个算法，从链表中删除*p结点。
+int DeleteNodeFromDoubleLoopLinkList(DoubleLoopLinkList &doubleLoopLinkList, ElementType element)
+{
+    DoubleLoopLinkListNode *ptr = doubleLoopLinkList.head->rightLink;
+    while (ptr != NULL && ptr->data != element)
+    {
+        ptr = ptr->rightLink;
+    }
+    if (ptr == doubleLoopLinkList.head)
+        return 0;
+    ptr->leftLink->rightLink = ptr->rightLink;
+    ptr->rightLink->leftLink = ptr->leftLink;
+    delete ptr;
+    return 1;
+}
 
 //设计一个算法，逆转带头结点的双向循环链表中所有结点的链接方向。
+void ReverseDoubleLoopLinkList(DoubleLoopLinkList doubleLoopLinkList)
+{
+    DoubleLoopLinkListNode *ptr = doubleLoopLinkList.head;
+    DoubleLoopLinkListNode *tmpPtr;
+    do
+    {
+        tmpPtr = ptr->rightLink;
+        ptr->rightLink = ptr->leftLink;
+        ptr->leftLink = tmpPtr;
+        ptr = tmpPtr;
+    } while (ptr != doubleLoopLinkList.head);
+}
 
 //设计一个算法，改造一个带头结点的双向链表，所有结点的原有次序保持在各结点的rLink域中，而lLink域把所有结点按照其值从小到大的顺序链接起来。
+void ModifySpecialDoubleLinkList(DoubleLinkList &doubleLinkList)
+{
+    DoubleLinkListNode *ptr = NULL;
+    DoubleLinkListNode *tmpPtr1 = NULL;
+    DoubleLinkListNode *tmpPtr2 = doubleLinkList.head->rightLink->rightLink;
+    doubleLinkList.head->leftLink = doubleLinkList.head->rightLink;
+    doubleLinkList.head->leftLink->leftLink = NULL;
+    while (tmpPtr2 != NULL)
+    {
+        tmpPtr1 = doubleLinkList.head->leftLink;
+        ptr = doubleLinkList.head;
+        while (tmpPtr1 != NULL && ptr->data < tmpPtr2->data)
+        {
+            ptr = tmpPtr1;
+            tmpPtr1 = tmpPtr1->leftLink;
+        }
+
+        ptr->leftLink = tmpPtr2;
+        tmpPtr2->leftLink = tmpPtr1;
+        tmpPtr2 = tmpPtr2->rightLink;
+    }
+}
 
 //设以带头结点的双向循环链表表示线性表L=（$a_1,a_2,\cdots ,a_{n-1},a_n$）。设计一个时间复杂度为O(n)的算法，将L改造为L=（$a_1,a_3,\cdots ,a_n, \cdots ,a_4,a_2$）。
+void ModifySpecialDoubleLoopLinkList(DoubleLoopLinkList &doubleLoopLinkList)
+{
+    DoubleLoopLinkListNode *ptr = doubleLoopLinkList.head->rightLink;
+    DoubleLoopLinkListNode *tmpPtr1 = ptr->rightLink;
+    DoubleLoopLinkListNode *tmpPtr2 = tmpPtr1->rightLink;
+    while (tmpPtr2 != NULL && tmpPtr1 != doubleLoopLinkList.head)
+    {
+        ptr->rightLink = tmpPtr2;
+        tmpPtr2->leftLink = ptr;
+        tmpPtr1->rightLink = ptr->leftLink;
+        ptr->leftLink = tmpPtr1;
+        ptr = tmpPtr2;
+        tmpPtr1 = ptr->rightLink;
+        tmpPtr2 = tmpPtr1->rightLink;
+    }
+    if (tmpPtr1 == doubleLoopLinkList.head)
+    {
+        tmpPtr2 = ptr->leftLink;
+        ptr->rightLink = tmpPtr2;
+        tmpPtr2->leftLink = ptr;
+    }
+}
 
 /*设计一个实现下属要求的Locate运算函数。设有一个带头结点双向链表L，每个结点有4个数据成员：
     指向前驱结点的指针lLink，指向后继节点的指针rLink，存放数据的成员data和访问频度frequency。
     所有结点的frequency初始时都为0。每当在链表上进行一次Locate(x)操作时，令元素值x结点的访问
     频度frequency加1，并将该结点前移，链接到与它的访问频度相等的结点后面，使得链表中所有结点
     保持按访问品读递减的顺序排列，以使频繁访问的结点总是靠近表头。*/
+struct SpecialDoubleLoopLinkListNode
+{
+    ElementType data;
+    int frequency;
+    SpecialDoubleLoopLinkListNode *rightLink;
+    SpecialDoubleLoopLinkListNode *leftLink;
+};
 
-/*设n个人围坐在圆桌周围，现在从第s个人开始报数，报到第m个人让他出局；然后从出局者的下一个人开始从新报数，数到第m个人，再让他出局....如此反复，直到所有的人全部出局为止。对于任意给定的n,s,m,求出这n个人的出局序列。以n=9,s=1,m=5为例验证。
+struct SpecialDoubleLoopLinkList
+{
+    SpecialDoubleLoopLinkListNode *head;
+    void initSpecialDoubleLoopLinkList();
+};
+
+SpecialDoubleLoopLinkListNode *Locate(SpecialDoubleLoopLinkList &doubleLoopLinkList, ElementType element)
+{
+    SpecialDoubleLoopLinkListNode *ptr = doubleLoopLinkList.head->rightLink;
+    SpecialDoubleLoopLinkListNode *tmpNode = NULL;
+    while (ptr != NULL && ptr->data != element)
+    {
+        ptr = ptr->rightLink;
+    }
+    if (ptr != NULL)
+    {
+        tmpNode->frequency++;
+        tmpNode = ptr;
+        tmpNode->leftLink->rightLink = tmpNode->rightLink;
+        tmpNode->rightLink->leftLink = tmpNode->leftLink;
+        ptr = tmpNode->leftLink;
+        while (ptr != NULL && tmpNode->frequency > ptr->frequency)
+        {
+            ptr = ptr->leftLink;
+        }
+        tmpNode->rightLink = ptr->rightLink;
+        tmpNode->leftLink = ptr;
+        ptr->rightLink->leftLink = tmpNode;
+        ptr->rightLink = tmpNode;
+        return tmpNode;
+    }
+    else
+        return NULL;
+}
+
+/*Josephus问题：设n个人围坐在圆桌周围，现在从第s个人开始报数，报到第m个人让他出局；然后从出局者的下一个人开始从新报数，数到第m个人，再让他出局....如此反复，直到所有的人全部出局为止。对于任意给定的n,s,m,求出这n个人的出局序列。以n=9,s=1,m=5为例验证。
 
     （1）. 若用整数序列1，2，3，...，n表示顺序围坐在圆桌周围的人，设计一个算法用一维数组表示作为求解过程中使用的数据结构，解决上述问题。
 
@@ -988,18 +1268,103 @@ void SeparateCharacterInLinkList(LinkList &linkList)
 
     （3）. 采用带头结点的双向循环链表作为求解过程中使用的数据结构，设计一个算法，解决上述问题。*/
 
-//设计一个算法，求两个用（01）向量表示的集合A和集合B的并，通过第3个用（01）向量表示的集合C返回运算结果，A和B的原有内容保持不变。
+//采用数组作为数据结构
+void Josephus(int *arr, int s, int m, int n)
+{
+    int i, j, k = n;
+    for (i = 0; i < n; i++)
+    {
+        i = (s - 1 + n) % n;
+    }
+    while (k > 0)
+    {
+        for (j = 1; j < m; j++)
+        {
+            i = (i + 1) % k;
+        }
+        cout << arr[i] << " ";
+        for (j = i + 1; j < k; j++)
+        {
+            arr[j - 1] = arr[j];
+        }
+        k--;
+    }
+    cout << endl;
+}
+//采用单循环链表作为数据结构
+void Josephus(SingleLoopLinkList &singleLoopLinkList, int s, int m, int n)
+{
+    SingleLoopLinkListNode *ptr = singleLoopLinkList.head->link;
+    SingleLoopLinkListNode *tmpPtr = singleLoopLinkList.head;
+    int i, j;
+    for (i = 1; i < s; i++)
+    {
+        ptr = ptr->link;
+    }
 
-//设计一个算法，求两个用（01）向量表示的集合A和集合B的交，通过第3个用（01）向量表示的集合C返回运算结果，A和B的原有内容保持不变。
+    for (i = 0; i < n; i++)
+    {
+        for (j = 1; j < m; j++)
+        {
+            tmpPtr = ptr;
+            ptr = ptr->link;
+            if (ptr == singleLoopLinkList.head)
+            {
+                tmpPtr = ptr;
+                ptr = ptr->link;
+            }
+        }
+        cout << ptr->data << " ";
+        tmpPtr->link = ptr->link;
+        delete ptr;
+        ptr = tmpPtr->link;
+    }
+    cout << endl;
+}
+//采用双循环链表作为数据结构
+void Josephus(DoubleLoopLinkList &doubleLoopLinkList, int s, int m, int n)
+{
+    DoubleLoopLinkListNode *ptr = doubleLoopLinkList.head->rightLink;
+    DoubleLoopLinkListNode *tmpPtr = NULL;
+    int i, j;
+    for (i = 1; i < s; i++)
+    {
+        ptr = ptr->rightLink;
+    }
 
-//设计一个算法，求两个用（01）向量表示的集合A和集合B的差，通过第3个用（01）向量表示的集合C返回运算结果，A和B的原有内容保持不变。
+    for (i = 0; i < n; i++)
+    {
+        for (j = 1; j < m; j++)
+        {
+            if (ptr->rightLink != doubleLoopLinkList.head)
+            {
+                ptr = ptr->rightLink;
+            }
+            else
+                ptr = doubleLoopLinkList.head->rightLink;
+        }
+        cout << ptr->data << " ";
+        ptr->leftLink->rightLink = ptr->rightLink;
+        ptr->rightLink->leftLink = ptr->leftLink;
+        tmpPtr = ptr->rightLink;
+        delete ptr;
+        ptr = tmpPtr;
+    }
+    cout << endl;
+}
 
 //设计一个算法，求两个用有序链表表示的集合A和集合B的并，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
-
+void UnionSet(LinkList &setA, LinkList &setB, LinkList &setC)
+{
+}
 //设计一个算法，求两个用有序链表表示的集合A和集合B的交，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
-
+void IntersectSet(LinkList &setA, LinkList &setB, LinkList &setC)
+{
+}
 //设计一个算法，求两个用有序链表表示的集合A和集合B的差，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
-
+void DefferenceSet(LinkList &setA, LinkList &setB, LinkList &setC)
+{
+}
 //若采用数组来存储一元多项式的系数，即用数组的第i个元素存放多项式的第i次幂项的系数，如对于一元多项式 $f(x) = 6x^6 + 7x^4 - 10x^2 + 5x +3$。设计两个算法，分别求一元多项式的和跟乘积。
 
 //设计一个算法，输入一元多项式的系数跟指数，按照指数降幂的方式建立多项式链表。如果输入的指数与链表中已有的某一项的指数相等，则新的项不加入，并报告作废信息。整个输入序列以输入系数为0标志结束。
