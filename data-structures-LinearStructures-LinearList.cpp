@@ -1356,18 +1356,167 @@ void Josephus(DoubleLoopLinkList &doubleLoopLinkList, int s, int m, int n)
 //设计一个算法，求两个用有序链表表示的集合A和集合B的并，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
 void UnionSet(LinkList &setA, LinkList &setB, LinkList &setC)
 {
+    ListNode *ptrA = setA.head->next;
+    ListNode *ptrB = setB.head->next;
+    ListNode *ptrC = setC.head;
+    ListNode *ptr = NULL;
+    while (ptrA != NULL && ptrB != NULL)
+    {
+        if (ptrA->data == ptrB->data)
+        {
+            ptrC->next = new ListNode;
+            ptrC->data = ptrA->data;
+            ptrC->next = nullptr;
+            setC.tail = ptrC;
+            ptrA = ptrA->next;
+            ptrB = ptrB->next;
+            setC.length += 1;
+        }
+        else if (ptrA->data < ptrB->data)
+        {
+            ptrC->next = new ListNode;
+            ptrC->data = ptrA->data;
+            ptrC->next = nullptr;
+            setC.tail = ptrC;
+            ptrA = ptrA->next;
+            setC.length += 1;
+        }
+        else
+        {
+            ptrC->next = new ListNode;
+            ptrC->data = ptrB->data;
+            ptrC->next = nullptr;
+            setC.tail = ptrC;
+            ptrB = ptrB->next;
+            setC.length += 1;
+        }
+        ptrC = ptrC->next;
+    }
+    if (ptrA != NULL)
+        ptr = ptrA;
+    else
+        ptr = ptrB;
+    while (ptr != NULL)
+    {
+        ptrC->next = new ListNode;
+        ptrC->data = ptr->data;
+        ptrC->next = nullptr;
+        setC.tail = ptrC;
+        ptrC = ptrC->next;
+        ptr = ptr->next;
+        setC.length += 1;
+    }
+    ptrC->next = nullptr;
 }
+
 //设计一个算法，求两个用有序链表表示的集合A和集合B的交，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
 void IntersectSet(LinkList &setA, LinkList &setB, LinkList &setC)
 {
+    ListNode *ptrA = setA.head->next;
+    ListNode *ptrB = setB.head->next;
+    ListNode *ptrC = setC.head;
+    while (ptrA != NULL && ptrB != NULL)
+    {
+        if (ptrA->data == ptrB->data)
+        {
+            ptrC->next = new ListNode;
+            ptrC->data = ptrA->data;
+            ptrC->next = nullptr;
+            setC.tail = ptrC;
+            ptrC = ptrC->next;
+            ptrA = ptrA->next;
+            ptrB = ptrB->next;
+        }
+        else if (ptrA->data < ptrB->data)
+        {
+            ptrA = ptrA->next;
+        }
+        else
+        {
+            ptrB = ptrB->next;
+        }
+    }
 }
+
 //设计一个算法，求两个用有序链表表示的集合A和集合B的差，通过第3个用有序链表表示的集合C返回运算结果，A和B的原有内容保持不变。
 void DefferenceSet(LinkList &setA, LinkList &setB, LinkList &setC)
 {
+    ListNode *ptrA = setA.head->next;
+    ListNode *ptrB = setB.head->next;
+    ListNode *ptrC = setC.head;
+    while (ptrA != NULL && ptrB != NULL)
+    {
+        if (ptrA->data == ptrB->data)
+        {
+            ptrA = ptrA->next;
+            ptrB = ptrB->next;
+        }
+        else if (ptrA->data < ptrB->data)
+        {
+            ptrC->next = new ListNode;
+            ptrC->data = ptrA->data;
+            ptrC->next = nullptr;
+            setC.tail = ptrC;
+            ptrC = ptrC->next;
+            ptrA = ptrA->next;
+            ptrB = ptrB->next;
+        }
+        else
+            ptrB = ptrB->next;
+    }
+    while (ptrA != NULL)
+    {
+        ptrC->next = new ListNode;
+        ptrC->data = ptrA->data;
+        ptrC->next = nullptr;
+        setC.tail = ptrC;
+        ptrC = ptrC->next;
+        ptrA = ptrA->next;
+    }
 }
+
 //若采用数组来存储一元多项式的系数，即用数组的第i个元素存放多项式的第i次幂项的系数，如对于一元多项式 $f(x) = 6x^6 + 7x^4 - 10x^2 + 5x +3$。设计两个算法，分别求一元多项式的和跟乘积。
+void AddPolynomial(double *polynomialA, double *polynomialB, double *result, int lengthA, int lengthB, int &lengthResult)
+{
+    if (lengthA > lengthB && lengthResult < lengthA)
+        return;
+    if (lengthA < lengthB && lengthResult < lengthB)
+        return;
+    int i = 0;
+    for (i = 0; i <= lengthA && i <= lengthB; i++)
+    {
+        result[i] = polynomialA[i] + polynomialB[i];
+    }
+    while (i <= lengthA)
+    {
+        result[i] = polynomialA[i];
+    }
+    while (i <= lengthB)
+    {
+        result[i] = polynomialB[i];
+    }
+    lengthResult = lengthA > lengthB ? lengthA : lengthB;
+}
 
 //设计一个算法，输入一元多项式的系数跟指数，按照指数降幂的方式建立多项式链表。如果输入的指数与链表中已有的某一项的指数相等，则新的项不加入，并报告作废信息。整个输入序列以输入系数为0标志结束。
+void MultiplyPolynomial(double *polynomialA, double *polynomialB, double *result, int lengthA, int lengthB, int &lengthResult)
+{
+    int i, j;
+    if (lengthA * lengthB + 1 >= lengthResult)
+        return;
+    for (i = 0; i < lengthA * lengthB + 1; i++)
+    {
+        result[i] = 0.0;
+    }
+    for (i = 0; i <= lengthA; i++)
+    {
+        for (j = 0; j <= lengthB; j++)
+        {
+            result[i + j] = result[i + j] + polynomialA[i] * polynomialB[j] * (i + j);
+        }
+    }
+    lengthResult = lengthA + lengthB;
+}
 
 /*设对于一个一元多项式 $P(x) = a_{m-1}x^{e_{m-1}} + a_{m-2}x^{e_{m-2}} + \cdots + a_{0}x^{e_{0}}$ ，用表长为m的带有头结点的单链表表示为 $(t_{m-1} , t_{m-2} , \cdots , t_1, t_0)$ 。其中，m是多项式 $P(x)$ 中非0项的个数，每一个 $t_i(0 \leq t_i \leq m-1)$ 是 $P(x)$ 的一个非0项，各个项按指数 $e_i$ 递减顺序排列： $e_{m-1} \gt e_{m-2} \gt \cdots \gt e_0 \gt 0$ 。
     
@@ -1375,13 +1524,111 @@ void DefferenceSet(LinkList &setA, LinkList &setB, LinkList &setC)
 
     （2）. 利用（1）中的插入算法，设计一个实现一元多项式乘法的算法。*/
 
+//一元多项式链表结点定义
+struct PolynomialListNode
+{
+    float coefficient;
+    int exponent;
+    PolynomialListNode *next;
+};
+//一元多项式链表结构
+struct PolynomialList
+{
+    PolynomialListNode *head;
+};
+//一元多项式插入算法
+void PolynomialListInsert(PolynomialList &polynomialList, float c, int e)
+{
+    PolynomialListNode *ptr = polynomialList.head;
+    PolynomialListNode *tmpPtr = polynomialList.head->next;
+    while (tmpPtr != NULL && tmpPtr->exponent > e)
+    {
+        ptr = tmpPtr;
+        tmpPtr = tmpPtr->next;
+    }
+    if (tmpPtr->exponent == e)
+    {
+        if (tmpPtr->coefficient + c != 0)
+            tmpPtr->coefficient = tmpPtr->coefficient + c;
+        else
+        {
+            ptr->next = tmpPtr->next;
+            delete tmpPtr;
+        }
+    }
+    else
+    {
+        PolynomialListNode *node = new PolynomialListNode;
+        node->exponent = e;
+        node->coefficient = c;
+        ptr->next = node;
+        node->next = tmpPtr;
+    }
+}
+//一元多项式乘法
+void PolynomialMutiply(PolynomialList &polynomialListA, PolynomialList &polynomialListB, PolynomialList &polynomialListResult)
+{
+    PolynomialListNode *ptrA = polynomialListA.head->next;
+    PolynomialListNode *ptrB = NULL;
+    while (ptrA != NULL)
+    {
+        ptrB = polynomialListB.head->next;
+        while (ptrB != NULL)
+        {
+            PolynomialListInsert(polynomialListResult, ptrA->coefficient * ptrB->coefficient, ptrA->exponent + ptrB->exponent);
+            ptrB = ptrB->next;
+        }
+        ptrA = ptrA->next;
+    }
+}
+
 //设计一个算法，按照降幂的次序输出一个一元多项式。
+void PolynomialPrint(PolynomialList polynomialList)
+{
+    PolynomialListNode *ptr = polynomialList.head->next;
+    while (ptr != NULL)
+    {
+        if (ptr->coefficient > 0)
+            cout << ptr->coefficient;
+        else
+            cout << "-" << 0 - ptr->coefficient;
+        if (ptr->exponent != 0)
+            cout << "x" << ptr->exponent;
+        if (ptr->next != NULL && ptr->next->coefficient > 0)
+            cout << "+";
+        ptr = ptr->next;
+    }
+}
 
 //用带头结点的单链表表示一个一元多项式，链表中的结点按幂指数降序链接。设计一个算法，将表示一元多项式的单链表就地逆置，改为按幂指数升序链接。
+void ReversePolynomial(PolynomialList &polynomialList)
+{
+    PolynomialListNode *ptr = polynomialList.head->next;
+    PolynomialListNode *tmpPtr1 = ptr->next;
+    PolynomialListNode *tmpPtr2 = NULL;
+    ptr->next = nullptr;
+    while (tmpPtr1 != NULL)
+    {
+        tmpPtr2 = tmpPtr1->next;
+        tmpPtr1->next = ptr;
+        ptr = tmpPtr2;
+        tmpPtr1 = tmpPtr2;
+    }
+    polynomialList.head->next = ptr;
+}
 
 //用带头结点的单链表表示一个一元多项式，试设计一个算法，计算多项式A在x处的值。
-
-//类似用数组表示一元多项式，可用二维数组A表示二元多项式，数组元素A\[i]\[j]表示多项式中 $x^i$ 和 $y^j$ 的系数。试设计一个算法，把用二维数组表示的二元多项式以常规多项式的形式按升幂顺序输出。对于多项式的每一项 $c_kx^iy^j$ 可以打印成 $c_k$x^iy^j ，其中 $c_k$ ，i 和 j用实际值输出。当 $c_k$ ， i ， j 的值为1时，可以不显示 $c_k$ ，i ， j ，^ 。
+double CalculatePolynomialValueWithGiveXValue(PolynomialList polynomialList, double x)
+{
+    PolynomialListNode *ptr = polynomialList.head->next;
+    double result = 0;
+    while (ptr != NULL)
+    {
+        result = result * x + ptr->coefficient;
+        ptr = ptr->next;
+    }
+    return result;
+}
 
 //线性表相关算法测试
 void testLinearListAlgorithms()
