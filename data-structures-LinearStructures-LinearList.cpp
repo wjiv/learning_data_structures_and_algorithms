@@ -1,7 +1,6 @@
 //线性结构——线性表完整代码
 
 // 头文件及名称空间
-
 #include <iostream>
 #include <cctype>
 
