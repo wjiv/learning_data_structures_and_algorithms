@@ -191,6 +191,110 @@ void testStack()
 
 #pragma region 顺序队列开始
 
+#pragma region 普通顺序队列
+
+//普通顺序队列结构
+struct SequenceQueue
+{
+private:
+    ElementType *data;
+    int front;
+    int rear;
+
+public:
+    void init();                    //初始化队列
+    void init(int size);            //初始化队列
+    bool empty();                   //判断队列是否为空
+    bool full();                    //判断队列是否已满
+    void push(ElementType element); //入队操作
+    ElementType pop();              //出队操作
+    ElementType getTop();           //获取队头元素
+};
+
+//初始化队列
+void SequenceQueue::init()
+{
+    this->data = new ElementType[MAX_SIZE];
+    this->front = -1;
+    this->rear = -1;
+}
+
+//初始化队列
+void SequenceQueue::init(int size)
+{
+    this->data = new ElementType(size);
+    this->front = -1;
+    this->rear = -1;
+}
+
+//判断队列是否为空
+bool SequenceQueue::empty()
+{
+    return this->front == this->rear;
+}
+
+//判断队列是否已满
+bool SequenceQueue::full()
+{
+    return this->rear == MAX_SIZE - 1;
+}
+
+//入队操作
+void SequenceQueue::push(ElementType element)
+{
+    if (!full())
+    {
+        this->rear += 1;
+        this->data[rear] = element;
+    }
+}
+
+//出队操作
+ElementType SequenceQueue::pop()
+{
+    if (!empty())
+    {
+        this->front += 1;
+        return this->data[front];
+    }
+}
+
+//获取队头元素
+ElementType SequenceQueue::getTop()
+{
+    if (!empty() && this->front > -1)
+        return this->data[front];
+}
+
+#pragma endregion 普通顺序队列
+
+#pragma region 循环队列
+
+//循环队列结构
+struct LoopQueue
+{
+    ElementType *data;
+    int front;
+    int rear;
+    int size;
+    int tag;
+    void init();                    //初始化队列
+    void init(int size);            //初始化队列
+    bool empty();                   //根据front与rear关系判断队列是否为空
+    bool empty();                   //根据队列元素个数判断队列是否为空
+    bool empty();                   //根据自定义标签tag判断队列是否为空
+    bool full();                    //根据front与rear关系判断队列是否已满
+    bool full();                    //根据队列元素个数判断队列是否已满
+    bool full();                    //根据自定义标签tag判断队列是否已满
+    void push(ElementType element); //入队操作
+    ElementType pop();              //出队操作
+    ElementType getTop();           //获取队头元素
+};
+
+//continue...
+
+#pragma endregion 循环队列
+
 #pragma endregion 顺序队列结束
 
 #pragma region 链式队列开始
@@ -198,6 +302,49 @@ void testStack()
 #pragma endregion 链式队列结束
 
 #pragma endregion 队列部分结束
+
+#pragma region 栈与队列相关算法开始
+
+#pragma region 栈相关算法开始
+
+//改写顺序栈的进栈成员函数push(x)，要求当栈满时，执行一个stackFull()操作进行溢出处理。其功能是：动态创建一个比原来的栈数组大一倍的新数组，代替原来的栈数组，原来栈数组中的元素占据新数组的前maxSize个位置。
+void StackFull()
+{
+}
+
+//借助栈实现单链表上的逆置运算。
+void ReverseLinkListWithStack()
+{
+}
+
+//设一个栈的输入序列是：1，2，3，...，n。设计一个算法，判断一个序列：$p_1，p_2，\cdots ，p_n$ 是否是一个合理的栈输出序列。
+bool IsIllegalStackSequence()
+{
+}
+
+#pragma endregion 栈相关算法结束
+
+#pragma region 队列相关算法开始
+
+#pragma endregion 队列相关算法结束
+
+#pragma region 栈的应用相关算法开始
+
+#pragma region 栈的应用相关算法结束
+
+#pragma region 队列的应用相关算法开始
+
+#pragma endregion 队列的应用相关算法结束
+
+#pragma region 双端队列相关算法开始
+
+#pragma endregion 双端队列相关算法结束
+
+#pragma endregion 栈与队列相关算法结束
+
+#pragma region 栈与队列相关算法测试函数开始
+
+#pragma endregion 栈与队列相关算法测试函数结束
 
 #pragma region main函数部分开始
 
