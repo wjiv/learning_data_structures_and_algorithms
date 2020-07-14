@@ -314,7 +314,21 @@ int main(){
 **C++语言编程实现**：
 
 ```C++
-
+//改写顺序栈的进栈成员函数push(x)，要求当栈满时，执行一个stackFull()操作进行溢出处理。其功能是：动态创建一个比原来的栈数组大一倍的新数组，代替原来的栈数组，原来栈数组中的元素占据新数组的前maxSize个位置。
+void StackFull(Stack &stack)
+{
+    Stack tmpStack;
+    tmpStack.init(stack.MAX_SIZE);
+    while (!stack.empty())
+    {
+        tmpStack.push(stack.pop());
+    }
+    stack.init(2 * stack.MAX_SIZE);
+    while (!tmpStack.empty())
+    {
+        stack.push(tmpStack.pop());
+    }
+}
 ```
 
 2. 设一个栈的输入序列是：1，2，3，...，n。设计一个算法，判断一个序列：$p_1，p_2，\cdots ，p_n$ 是否是一个合理的栈输出序列。
@@ -322,7 +336,31 @@ int main(){
 **C++语言编程实现**：
 
 ```C++
-
+//设一个栈的输入序列是：1，2，3，...，n。设计一个算法，判断一个序列：$p_1，p_2，\cdots ，p_n$ 是否是一个合理的栈输出序列。
+bool IsIllegalStackSequence(ElementType *pushSequence, ElementType *popSequence, int length)
+{
+    Stack stack;
+    stack.init(length);
+    int i = 0;
+    int j = 0;
+    stack.push(pushSequence[i]);
+    while (true)
+    {
+        if (stack.getTop() == popSequence[j])
+        {
+            stack.pop();
+            i++;
+        }
+        else
+        {
+            j++;
+            stack.push(popSequence[j]);
+        }
+        if (i >= length || j >= length)
+            break;
+    }
+    return stack.empty();
+}
 ```
 
 ---
@@ -370,7 +408,219 @@ int main(){
 **C++语言编码实现**：
 
 ```C++
+#include <iostream>
+using namespace std;
 
+typedef int ElementType;
+const int MAX_SIZE = 10;
+
+//普通顺序队列结构
+struct SequenceQueue
+{
+private:
+    ElementType *data;
+    int front;
+    int rear;
+    int MAX_SIZE;
+
+public:
+    void init();                    //初始化队列
+    void init(int size);            //初始化队列
+    bool empty();                   //判断队列是否为空
+    bool full();                    //判断队列是否已满
+    void push(ElementType element); //入队操作
+    ElementType pop();              //出队操作
+    ElementType getFront();         //获取队头元素
+};
+
+//初始化队列
+void SequenceQueue::init()
+{
+    this->data = new ElementType[MAX_SIZE];
+    this->front = -1;
+    this->rear = -1;
+    this->MAX_SIZE = MAX_SIZE;
+}
+
+//初始化队列
+void SequenceQueue::init(int size)
+{
+    this->data = new ElementType(size);
+    this->front = -1;
+    this->rear = -1;
+    this->MAX_SIZE = size;
+}
+
+//判断队列是否为空
+bool SequenceQueue::empty()
+{
+    return this->front == this->rear;
+}
+
+//判断队列是否已满
+bool SequenceQueue::full()
+{
+    return this->rear == MAX_SIZE - 1;
+}
+
+//入队操作
+void SequenceQueue::push(ElementType element)
+{
+    if (!full())
+    {
+        this->rear += 1;
+        this->data[rear] = element;
+    }
+}
+
+//出队操作
+ElementType SequenceQueue::pop()
+{
+    if (!empty())
+    {
+        this->front += 1;
+        return this->data[front];
+    }
+}
+
+//获取队头元素
+ElementType SequenceQueue::getFront()
+{
+    if (!empty() && this->front > -1)
+        return this->data[front];
+}
+
+#pragma endregion 普通顺序队列结束
+
+#pragma region 循环队列开始
+
+//循环队列结构
+struct LoopQueue
+{
+private:
+    ElementType *data;
+    int front;
+    int rear;
+    int count;
+    int tag;
+
+public:
+    int MAX_SIZE;
+    void init();                    //初始化队列
+    void init(int size);            //初始化队列
+    bool empty();                   //根据front与rear关系判断队列是否为空
+    bool empty();                   //根据队列元素个数判断队列是否为空
+    bool empty();                   //根据自定义标签tag判断队列是否为空
+    bool full();                    //根据front与rear关系判断队列是否已满
+    bool full();                    //根据队列元素个数判断队列是否已满
+    bool full();                    //根据自定义标签tag判断队列是否已满
+    int length();                   //获取队列长度
+    void push(ElementType element); //入队操作
+    ElementType pop();              //出队操作
+    ElementType getFront();         //获取队头元素
+};
+
+//初始化队列
+void LoopQueue::init()
+{
+    this->data = new ElementType[MAX_SIZE];
+    this->front = 0;
+    this->rear = 0;
+    this->MAX_SIZE = MAX_SIZE;
+    this->count = 0;
+    this->tag = 0;
+}
+
+//初始化队列
+void LoopQueue::init(int size)
+{
+    this->data = new ElementType[size];
+    this->front = 0;
+    this->rear = 0;
+    this->MAX_SIZE = size;
+    this->count = 0;
+    this->tag = 0;
+}
+
+//根据front与rear的关系判断队列是否为空
+bool LoopQueue::empty()
+{
+    return this->front == this->rear;
+}
+
+//根据队列元素个数判断队列是否为空
+bool LoopQueue::empty()
+{
+    return this->count == 0 && this->front == this->rear;
+}
+
+//根据自定义标签tag判断队列是否为空
+bool LoopQueue::empty()
+{
+    return this->tag == 0 && this->front == this->rear;
+}
+
+//根据front与rear的关系判断队列是否已满
+bool LoopQueue::full()
+{
+    return this->rear + 1 == this->front;
+}
+
+//根据队列元素个数判断队列是否已满
+bool LoopQueue::full()
+{
+    return this->count == this->MAX_SIZE && this->front == this->rear;
+}
+
+//根据自定义标签tag判断队列是否已满
+bool LoopQueue::full()
+{
+    return this->tag = 1 && this->front == this->rear;
+}
+
+//入队操作
+void LoopQueue::push(ElementType element)
+{
+    if (!full())
+    {
+        this->data[(this->rear + 1) % this->MAX_SIZE];
+        this->rear += 1;
+        this->count += 1;
+        this->tag = 1;
+    }
+}
+
+//出队操作
+ElementType LoopQueue::pop()
+{
+    if (!empty())
+    {
+        this->front = (this->front + 1) % this->MAX_SIZE;
+        this->count -= 1;
+        this->tag = 0;
+        return this->data[this->front];
+    }
+}
+
+//获取队列长度
+int LoopQueue::length()
+{
+    return this->count;
+}
+
+//获取队头元素
+ElementType LoopQueue::getFront()
+{
+    if (!empty())
+    {
+        return this->data[(this->front + 1) % this->MAX_SIZE];
+    }
+}
+
+//main函数
+int main(){
+    return 0;
+}
 ```
 
 ---
@@ -388,7 +638,175 @@ int main(){
 **C++语言编码实现**：
 
 ```C++
+#include <iostream>
+using namespace std;
 
+typedef int ElementType;
+const int MAX_SIZE = 10;
+
+#pragma region 基于单链表的链式队列开始
+
+//链式队列结点结构
+struct LinkQueueNode
+{
+    ElementType data;
+    LinkQueueNode *link;
+};
+
+//链式队列结构
+struct LinkQueue
+{
+private:
+    LinkQueueNode *front; //队头指针
+    LinkQueueNode *rear;  //队尾指针
+    int count;            //队列元素个数
+
+public:
+    void init();                    //初始化队列
+    bool empty();                   //判断队列是否为空
+    void push(ElementType element); //入栈操作
+    ElementType pop();              //出栈操作
+    ElementType getFront();         //获取队头元素
+};
+
+//初始化队列
+void LinkQueue::init()
+{
+    this->front = new LinkQueueNode;
+    this->rear = NULL;
+    this->front->link = this->rear;
+    this->count = 0;
+}
+
+//判断队列是否为空
+bool LinkQueue::empty()
+{
+    return this->front->link == nullptr || this->front->link == NULL;
+}
+
+//入队操作
+void LinkQueue::push(ElementType element)
+{
+    LinkQueueNode *node = new LinkQueueNode;
+    node->data = element;
+    node->link = nullptr;
+    if (empty())
+    {
+        this->front->link = node;
+        this->rear = node;
+    }
+    else
+    {
+        this->rear->link = node;
+        this->rear = node;
+    }
+}
+
+//出队操作
+ElementType LinkQueue::pop()
+{
+    if (!empty())
+    {
+        LinkQueueNode *ptr = this->front->link;
+        this->front->link = ptr->link;
+        ElementType element = ptr->data;
+        delete ptr;
+        return element;
+    }
+}
+
+//获取队头元素
+ElementType LinkQueue::getFront()
+{
+    if (!empty)
+        return this->front->link->data;
+}
+
+#pragma endregion 基于单链表的链式队列结束
+
+#pragma region 基于单循环链表的队列开始
+
+//基于单循环链表的队列结点结构
+struct SingleLoopLinkQueueNode
+{
+    ElementType data;
+    SingleLoopLinkQueueNode *link;
+};
+
+//基于单循环链表的队列结构
+struct SingleLoopLinkQueue
+{
+private:
+    SingleLoopLinkQueueNode *rear; //队尾指针
+    int count;                     //队列元素个数
+
+public:
+    void init();                    //初始化队列
+    bool empty();                   //判断队列是否为空
+    void push(ElementType element); //入栈操作
+    ElementType pop();              //出栈操作
+    ElementType getFront();         //获取队头元素
+};
+
+//初始化队列
+void SingleLoopLinkQueue::init()
+{
+    this->rear = new SingleLoopLinkQueueNode;
+    count = 0;
+}
+
+//判断队列是否为空
+bool SingleLoopLinkQueue::empty()
+{
+    return this->rear->link == nullptr || this->rear->link == NULL;
+}
+
+//入队操作
+void SingleLoopLinkQueue::push(ElementType element)
+{
+    if (this->count == 0)
+    {
+        this->rear->data = element;
+        this->rear->link = this->rear;
+        count += 1;
+    }
+    else
+    {
+        SingleLoopLinkQueueNode *node = new SingleLoopLinkQueueNode;
+        node->data = element;
+        node->link = this->rear->link;
+        this->rear->link = node;
+    }
+}
+
+//出队操作
+ElementType SingleLoopLinkQueue::pop()
+{
+    if (!empty())
+    {
+        SingleLoopLinkQueueNode *ptr = this->rear->link;
+        ElementType element = ptr->data;
+        this->rear->link = ptr->link;
+        delete ptr;
+        return element;
+    }
+}
+
+//获取队头元素
+ElementType SingleLoopLinkQueue::getFront()
+{
+    if (!empty())
+        return this->rear->link->data;
+}
+
+#pragma endregion 基于单循环链表的队列结束
+
+#pragma endregion 链式队列结束
+
+//main函数
+int main(){
+    return 0;
+}
 ```
 
 ---
@@ -442,6 +860,21 @@ int main(){
 **C++语言编码实现**：
 
 ```C++
+//改进采用用一维数组存储元素的循环队列的入队函数。当队列满并需要插入新元素时将数组空间扩大一倍，使得新元素得以插入。
+void QueueExpansion(LoopQueue &loopQueue)
+{
+    LoopQueue tmpQueue;
+    tmpQueue.init(loopQueue.MAX_SIZE);
+    while (!loopQueue.empty())
+    {
+        tmpQueue.push(loopQueue.pop());
+    }
+    loopQueue.init(2 * loopQueue.MAX_SIZE);
+    while (!tmpQueue.empty())
+    {
+        loopQueue.push(tmpQueue.pop());
+    }
+}
 ```
 
 2. 改进采用用一维数组存储元素的循环队列的出队函数。当队列元素少于数组空间的1/4时将数组空间自动缩小一半。
@@ -449,6 +882,24 @@ int main(){
 **C++语言编码实现**：
 
 ```C++
+//改进采用用一维数组存储元素的循环队列的出队函数。当队列元素少于数组空间的1/4时将数组空间自动缩小一半。
+void ShrinkQueue(LoopQueue &loopQueue)
+{
+    if (loopQueue.length() < loopQueue.MAX_SIZE / 4)
+    {
+        LoopQueue tmpQueue;
+        tmpQueue.init(loopQueue.MAX_SIZE / 2);
+        while (!loopQueue.empty())
+        {
+            tmpQueue.push(loopQueue.pop());
+        }
+        loopQueue.init(loopQueue.MAX_SIZE / 2);
+        while (!tmpQueue.empty())
+        {
+            loopQueue.push(tmpQueue.pop());
+        }
+    }
+}
 ```
 
 ---
@@ -457,9 +908,20 @@ int main(){
 
 #### 栈在表达式求值中的应用
 
-1. **中缀表达式**：
+1. **中缀表达式**：中缀表达式，是我们日常日生活中最常用的表达式。即运算符位于两个运算数之间（双目运算符）。
 
-2. **后缀表达式**：
+2. **后缀表达式**：后缀表达式是指根据运算顺序，一般运算符在参与运算数的后面。
+
+在计算机中，计算后缀表达式要比计算中缀表达式容易的多。一个中缀表达式，在计算机中往往先转化为后缀表达式，再进行求值。
+
+- **后缀表达式计算方法**：在后缀表达式中，运算符在运算数的后面。因此，对于双目运算符，需要找到运算符临近的前两个数，而单目运算符需要找到临近的前一个数。同时在计算完之后要保存结果，方便下一个运算符临近的数参与运算。根据后缀表达式计算的特点，往往采用栈结构来计算后缀表达式。一般方法是：顺序扫描表达式，若遇到运算数，则压入栈中，若遇到运算符，则从栈中弹出两个运算数（如果是单目运算符，则弹出一个）做对应运算符的运算，并将结果重新压入栈中。当表达式扫描处理完成之后，堆栈中存放的元素即为后缀表达式计算的结果。
+
+- **中缀表达式转后缀表达式方法**：中缀表达式转后缀表达式同样也借助栈结构来完成。一般方法是：遇到运算数，则直接输出。遇到操作符，则与栈顶操作符比较，若栈空或者栈顶操作符优先级小于当前运算符优先级，则输出该操作符。否则，需要再判断下一个运算符的优先级，若下一个运算符的优先级比栈顶运算符优先级高，则直接输出该优先级，否则输出栈顶运算符，并将该运算符压入栈中。当遇到左括号时，左括号入栈，优先级降到最低，当遇到右括号时，栈中左括号前的内容全部输出。依次类推，最后输出的序列就是中缀表达式转为后缀表达式的结果。
+
+**C++语言编程实现**：
+
+```C++
+```
 
 #### 栈在递归中的应用
 

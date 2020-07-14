@@ -103,7 +103,7 @@ public:
     void init();                    //初始化栈
     bool empty();                   //判断栈是否为空
     bool push(ElementType element); //入栈操作
-    bool pop(ElementType &element); //出栈操作
+    ElementType pop();              //出栈操作
     ElementType getTop();           //获取栈顶元素
 };
 
@@ -131,15 +131,17 @@ bool LinkStack::push(ElementType element)
 }
 
 //出栈操作
-bool LinkStack::pop(ElementType &element)
+ElementType LinkStack::pop()
 {
-    if (empty())
-        return false;
-    element = this->top->link->data;
-    LinkStackNode *node = this->top->link;
-    this->top->link = node->link;
-    delete node;
-    return true;
+    ElementType element;
+    if (!empty())
+    {
+        element = this->top->link->data;
+        LinkStackNode *node = this->top->link;
+        this->top->link = node->link;
+        delete node;
+    }
+    return element;
 }
 
 //获取栈顶元素
@@ -164,11 +166,9 @@ void testStack()
     sequenceStack.push(3);
     sequenceStack.push(4);
     sequenceStack.push(5);
-    ElementType e;
     while (!sequenceStack.empty())
     {
-        sequenceStack.pop(e);
-        cout << e << " ";
+        cout << sequenceStack.pop() << " ";
     }
     cout << endl;
     cout << "链式栈测试：" << endl;
@@ -182,8 +182,7 @@ void testStack()
     linkStack.push(10);
     while (!linkStack.empty())
     {
-        linkStack.pop(e);
-        cout << e << " ";
+        cout << linkStack.pop() << " ";
     }
     cout << endl;
 }
