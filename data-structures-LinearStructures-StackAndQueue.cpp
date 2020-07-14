@@ -290,11 +290,11 @@ public:
     void init();                    //初始化队列
     void init(int size);            //初始化队列
     bool empty();                   //根据front与rear关系判断队列是否为空
-    bool empty();                   //根据队列元素个数判断队列是否为空
-    bool empty();                   //根据自定义标签tag判断队列是否为空
+    bool emptySize();               //根据队列元素个数判断队列是否为空
+    bool emptyTag();                //根据自定义标签tag判断队列是否为空
     bool full();                    //根据front与rear关系判断队列是否已满
-    bool full();                    //根据队列元素个数判断队列是否已满
-    bool full();                    //根据自定义标签tag判断队列是否已满
+    bool fullSize();                //根据队列元素个数判断队列是否已满
+    bool fullTag();                 //根据自定义标签tag判断队列是否已满
     int length();                   //获取队列长度
     void push(ElementType element); //入队操作
     ElementType pop();              //出队操作
@@ -330,13 +330,13 @@ bool LoopQueue::empty()
 }
 
 //根据队列元素个数判断队列是否为空
-bool LoopQueue::empty()
+bool LoopQueue::emptySize()
 {
     return this->count == 0 && this->front == this->rear;
 }
 
 //根据自定义标签tag判断队列是否为空
-bool LoopQueue::empty()
+bool LoopQueue::emptyTag()
 {
     return this->tag == 0 && this->front == this->rear;
 }
@@ -348,13 +348,13 @@ bool LoopQueue::full()
 }
 
 //根据队列元素个数判断队列是否已满
-bool LoopQueue::full()
+bool LoopQueue::fullSize()
 {
     return this->count == this->MAX_SIZE && this->front == this->rear;
 }
 
 //根据自定义标签tag判断队列是否已满
-bool LoopQueue::full()
+bool LoopQueue::fullTag()
 {
     return this->tag = 1 && this->front == this->rear;
 }
@@ -478,7 +478,7 @@ ElementType LinkQueue::pop()
 //获取队头元素
 ElementType LinkQueue::getFront()
 {
-    if (!empty)
+    if (!empty())
         return this->front->link->data;
 }
 
@@ -657,19 +657,180 @@ void ShrinkQueue(LoopQueue &loopQueue)
 
 #pragma endregion 队列相关算法结束
 
-#pragma region 栈的应用相关算法开始
-
-#pragma region 栈的应用相关算法结束
-
-#pragma region 队列的应用相关算法开始
-
-#pragma endregion 队列的应用相关算法结束
-
-#pragma region 双端队列相关算法开始
-
-#pragma endregion 双端队列相关算法结束
-
 #pragma endregion 栈与队列相关算法结束
+
+#pragma region 栈与队列的应用开始
+
+#pragma region 栈应用开始
+
+#pragma region 表达式求值开始
+
+//括号匹配算法——字符数组参数
+bool MatchBracket(char *brackets)
+{
+    Stack stack;
+    stack.init(10);
+    char bracket;
+    char *ptr = brackets;
+    while (*brackets != '\0')
+    {
+        switch (*ptr)
+        {
+        case '{':
+        case '[':
+        case '(':
+            stack.push(*ptr);
+            break;
+        case '}':
+            bracket = stack.getTop();
+            if (bracket == '{')
+                stack.pop();
+            else
+                return 0;
+            break;
+        case ']':
+            bracket = stack.getTop();
+            if (bracket == '[')
+                stack.pop();
+            else
+                return 0;
+        case ')':
+            bracket = stack.getTop();
+            if (bracket == '(')
+                stack.pop();
+            else
+                return 0;
+        default:
+            break;
+        }
+        ptr++;
+    }
+    return stack.empty();
+}
+
+//括号匹配算法——字符串参数
+bool MatchBracket(string brackets)
+{
+    Stack stack;
+    stack.init(10);
+    char bracket;
+    int index = brackets[0];
+    while (index <= brackets.length())
+    {
+        switch (brackets[index])
+        {
+        case '{':
+        case '[':
+        case '(':
+            stack.push(brackets[index]);
+            break;
+        case '}':
+            bracket = stack.getTop();
+            if (bracket == '{')
+                stack.pop();
+            else
+                return 0;
+            break;
+        case ']':
+            bracket = stack.getTop();
+            if (bracket == '[')
+                stack.pop();
+            else
+                return 0;
+        case ')':
+            bracket = stack.getTop();
+            if (bracket == '(')
+                stack.pop();
+            else
+                return 0;
+        default:
+            break;
+        }
+        index++;
+    }
+    return stack.empty();
+}
+
+int GetPriority(char op, int tag)
+{
+    int priority = -1;
+    if (tag == 1)
+    {
+        switch (op)
+        {
+        case '{':
+            break;
+        default:
+            break;
+        }
+    }
+    if (tag == 0)
+    {
+        switch (op)
+        {
+        case '{':
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+bool InfixExpressionToSuffixExpression(string infixExpression, string *suffixExpression)
+{
+}
+
+double EvaluateValueOfSuffixExpression(string suffixExpression)
+{
+}
+
+#pragma endregion 表达式求值结束
+
+#pragma region 栈递归应用开始
+
+//Hanoi塔问题
+
+#pragma endregion 栈递归应用结束
+
+#pragma endregion 栈应用结束
+
+#pragma region 队列应用开始
+
+/*试利用循环队列编写求k阶斐波那契序列中前n+1项 
+    $(f_0,f_1,\cdots,f_{n-1},f_n)$ 的算法，要求满足：
+    $f_n \leq max$ 而 $f_{n+1} \geq max$ ，其中max为
+    某个约定的常数。另外要求循环队列长度为k，并且在算法执
+    行结束后，循环队列中的元素应是该斐波那契序列的最后k项
+     $f_{n-k+1},\cdots,f_n$。*/
+
+long FibonacciSequence(long queue[], int k, int &rear, int &n, long maxValue)
+{
+    long sum = 0;
+    for (int i = 0; i < k - 1; i++)
+    {
+        queue[i] = 0;
+    }
+    queue[k - 1] = 1;
+    rear = n = k - 1;
+    sum = 1;
+    while (true)
+    {
+        for (int i = 1; i < k; i++)
+        {
+            sum += queue[(rear - i + k) % k];
+        }
+        if (sum > maxValue)
+            break;
+        n++;
+        rear = (rear + 1) % k;
+        queue[rear] = sum;
+    }
+    return queue[rear];
+}
+
+#pragma endregion 队列应用结束
+
+#pragma region 栈与队列的应用结束
 
 #pragma region 栈与队列相关算法测试函数开始
 
