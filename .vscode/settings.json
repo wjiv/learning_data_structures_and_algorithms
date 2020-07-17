@@ -3,6 +3,8 @@
         "iostream": "cpp",
         "ostream": "cpp",
         "string_view": "cpp",
-        "cctype": "cpp"
+        "cctype": "cpp",
+        "iosfwd": "cpp",
+        "algorithm": "cpp"
     }
 }

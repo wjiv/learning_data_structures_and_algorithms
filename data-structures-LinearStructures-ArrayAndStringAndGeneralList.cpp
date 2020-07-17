@@ -1,6 +1,7 @@
 // 线性表——数组和字符串完整代码
 
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
@@ -12,10 +13,95 @@ const int MAX_SIZE = 10;
 
 struct String
 {
+private:
     char *data;
-    int length;
+    int count;
     int MAX_SIZE;
+
+public:
+    String() : data(), count(), MAX_SIZE()
+    {
+        data = new char[MAX_SIZE];
+        count = 0;
+        MAX_SIZE = MAX_SIZE;
+    }
+    String(int size)
+    {
+        data = new char[size];
+        count = 0;
+        MAX_SIZE = size;
+    }
+    int length();                      //获取字符串长度
+    char &operator[](const int index); //操作符[]重载
+    void operator=(char const *str);   //操作符=重载
+
+    friend istream &operator>>(istream &in, String str)
+    {
+        for (int i = 0; i < str.count; i++)
+        {
+            in >> str.data[i];
+        }
+        return in;
+    }
+
+    friend ostream &operator<<(ostream &out, String str)
+    {
+        for (int i = 0; i < str.count; i++)
+        {
+            out << str[i];
+        }
+        return out;
+    }
 };
+
+//重载[]操作符
+char &String::operator[](const int index)
+{
+    return this->data[index];
+}
+
+//重载=操作符
+void String::operator=(char const *str)
+{
+    int size = 0;
+    while (true)
+    {
+        if (str[size] == '\0')
+            break;
+        else
+            size++;
+    }
+    if (this->MAX_SIZE < size + 1)
+    {
+        this->data = new char[size + 1];
+        this->MAX_SIZE = size + 1;
+    }
+    this->count = 0;
+    while (true)
+    {
+        if (str[this->count] == '\0')
+            break;
+        else
+        {
+            this->data[this->count] = str[this->count];
+            this->count++;
+        }
+    }
+}
+
+//获取字符串长度
+int String::length()
+{
+    return this->count;
+}
+
+//字符串测试
+void testString()
+{
+    String str;
+    str = "hello world!";
+    cout << str << endl;
+}
 
 #pragma endregion 字符串结束
 
@@ -394,20 +480,86 @@ void FillNaturalNumberInSpiralMatrix(int **arr, int n)
 
 #pragma region 字符串相关算法开始
 
-//已知两个字符串分别为 str1 = "(xyz)+\*"，str2 = "(x+z)\*y" 。将str1转换成str2。
-
-//设计一个算法，在串T中从指定位置寻找与串P匹配的子串，通过函数返回求得子串在串T中的位置。
-
-//设计一个算法，若串T是字符串S的子串，则从S中用V替换掉所有的T。
-
 //设计一个算法，统计字符串中各个不同字符出现的频度。
+void GetFrequency(string str, char ch[], int freq[], int &k)
+{
+    if (str.length() == 0)
+        return;
+    ch[0] = str[0];
+    freq[0] = 1;
+    int tmp = 1;
+    for (int i = 1; i < str.length(); i++)
+    {
+        ch[i] = 0;
+    }
+    for (int i = 0; i < str.length(); i++)
+    {
+        for (int j = 0; j < tmp && ch[j] != str[i]; j++)
+        {
+            if (j == tmp)
+            {
+                ch[tmp] = str[i];
+                ch[tmp]++;
+                tmp++;
+            }
+            else
+                ch[j]++;
+        }
+    }
+}
 
 /*所谓回文串，是指从前往后读和从后往前倒着都都一样的不含空白字符的
     字符串。设计一个算法，判断一个字符串是不是回文串。*/
+bool IsPalindrome(string str)
+{
+    int i = 0;
+    int j = str.length() - 1;
+    while (i < j)
+    {
+        if (str[i] != str[j])
+            return false;
+        else
+        {
+            i++;
+            j--;
+        }
+    }
+    return true;
+}
 
 //设计一个递归算法，将整数字符串转换为整数。
+int ConvertToNumber(string str, int start, int finish)
+{
+    if (start > finish)
+        return -1;
+    if (start == finish)
+        return str[finish] - '0';
+    return ConvertToNumber(str, start, finish - 1) * 10 + str[finish] - '0';
+}
 
 //设有两个字符串A，B。设计一个算法，找出A中第一个不在B中出现的字符。
+bool AFindFistCharWithoutAppear(string str1, string str2, char &ch)
+{
+    bool flag = true;
+    int i;
+    for (i = 0; i < str1.length(); i++)
+    {
+        flag = true;
+        for (int j = 0; j < str2.length(); j++)
+        {
+            if (str1[i] == str2[j])
+            {
+                flag = false;
+                break;
+            }
+        }
+    }
+    if (flag)
+    {
+        ch = str1[i];
+    }
+    return flag;
+}
 
 #pragma endregion 字符串相关算法结束
 
@@ -416,5 +568,6 @@ void FillNaturalNumberInSpiralMatrix(int **arr, int n)
 //main函数
 int main()
 {
+    testString();
     return 0;
 }
